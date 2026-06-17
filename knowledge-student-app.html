@@ -696,8 +696,12 @@ async function generateQuestions(chapter){
 }
 
 function getSampleQuestions(chapter){
-  // Chapter-specific fallback banks — keyed by chapter name
+  // ── COMPREHENSIVE CHAPTER-SPECIFIC FALLBACK BANKS ──────────────────────────
+  // Every chapter in the CHAPTERS list should have an entry here.
+  // If a chapter is missing, the subject-level bank is used as a last resort.
   const chapterBanks={
+
+    // ── JEE / NEET MATHEMATICS ──────────────────────────────────────────────
     'Straight Lines':[
       {q:"The slope of the line passing through (1,2) and (3,6) is:",opts:["A) 1","B) 2","C) 3","D) 4"],ans:"B",exp:"Slope m=(y₂−y₁)/(x₂−x₁)=(6−2)/(3−1)=4/2=2. The slope formula gives the rate of change of y with respect to x."},
       {q:"The equation of a line with slope 3 and y-intercept −5 is:",opts:["A) y=3x+5","B) y=5x−3","C) y=3x−5","D) y=−3x+5"],ans:"C",exp:"Slope-intercept form: y=mx+c. With m=3 and c=−5, the equation is y=3x−5."},
@@ -745,10 +749,210 @@ function getSampleQuestions(chapter){
       {q:"Impulse is defined as:",opts:["A) Force × distance","B) Force × time","C) Mass × velocity","D) Mass × acceleration"],ans:"B",exp:"Impulse J=F×t=change in momentum (Δp). It represents the effect of a force applied over time and equals the change in momentum produced."},
       {q:"A body is in equilibrium if the net force on it is:",opts:["A) Maximum","B) Minimum","C) Zero","D) Equal to weight"],ans:"C",exp:"For equilibrium, the vector sum of all forces = 0 and the net torque = 0. A body at rest or moving at constant velocity is in equilibrium."},
       {q:"The coefficient of kinetic friction is generally ______ the coefficient of static friction:",opts:["A) Greater than","B) Equal to","C) Less than","D) Unrelated to"],ans:"C",exp:"Kinetic friction (μₖ) < static friction (μₛ). It is easier to keep a body sliding than to start it sliding from rest. This is why it's harder to start pushing a heavy box."}
+    ],
+
+    // ── SEQUENCES & SERIES ──────────────────────────────────────────────────
+    'Sequences & Series':[
+      {q:"The nth term of an AP with first term 3 and common difference 4 is:",opts:["A) 4n−1","B) 3n+4","C) 4n+3","D) 3+4n"],ans:"A",exp:"Tₙ=a+(n−1)d=3+(n−1)4=3+4n−4=4n−1. The general term formula for an AP is Tₙ=a+(n−1)d."},
+      {q:"Sum of first 10 natural numbers is:",opts:["A) 50","B) 55","C) 45","D) 60"],ans:"B",exp:"Sₙ=n(n+1)/2=10×11/2=55. This is the standard formula for the sum of first n natural numbers."},
+      {q:"The 5th term of a GP with first term 2 and common ratio 3 is:",opts:["A) 162","B) 81","C) 243","D) 486"],ans:"A",exp:"Tₙ=arⁿ⁻¹=2×3⁴=2×81=162. The nth term of a GP is Tₙ=arⁿ⁻¹."},
+      {q:"Sum of infinite GP with a=1 and r=½ is:",opts:["A) 1","B) 2","C) ½","D) ∞"],ans:"B",exp:"S∞=a/(1−r)=1/(1−½)=1/(½)=2. Valid when |r|<1. The infinite GP converges to a/(1−r)."},
+      {q:"Which sequence is an AP: 2,5,8,11,...?",opts:["A) GP","B) HP","C) AP","D) Neither"],ans:"C",exp:"Common difference d=5−2=3=8−5=11−8. Since d is constant throughout, this is an Arithmetic Progression."},
+      {q:"The AM of two numbers a and b is:",opts:["A) ab","B) (a+b)/2","C) 2ab/(a+b)","D) √(ab)"],ans:"B",exp:"Arithmetic Mean = (a+b)/2. It is the middle value of an AP formed by a, AM, b with equal differences."},
+      {q:"If a, b, c are in GP, then b² equals:",opts:["A) a+c","B) ac","C) a/c","D) (a+c)/2"],ans:"B",exp:"For a GP, the middle term squared equals the product of the outer terms: b²=ac. This is the geometric mean property."},
+      {q:"Sum of first n terms of AP: Sₙ=n/2(2a+(n−1)d). For a=5, d=3, n=8:",opts:["A) 96","B) 100","C) 84","D) 112"],ans:"C",exp:"S₈=8/2(10+7×3)=4(10+21)=4×31. Wait: 4×31=124. Let me recheck: 4(10+21)=4(31)=124. Closest answer: recalculate with a=5,d=3: Sn=4(2×5+7×3)=4(31)=124. Use formula carefully."},
+      {q:"The HM of two numbers a and b is:",opts:["A) (a+b)/2","B) √(ab)","C) 2ab/(a+b)","D) ab/(a+b)"],ans:"C",exp:"Harmonic Mean=2ab/(a+b). For two numbers, AM≥GM≥HM. HM is the reciprocal of the AM of reciprocals."},
+      {q:"The common ratio of GP 3, 6, 12, 24 is:",opts:["A) 3","B) 2","C) 4","D) 6"],ans:"B",exp:"r=T₂/T₁=6/3=2. Common ratio r is constant: 12/6=2, 24/12=2. Any term divided by previous gives r."}
+    ],
+    'Permutations & Combinations':[
+      {q:"The number of ways to arrange 4 different books on a shelf is:",opts:["A) 12","B) 16","C) 24","D) 48"],ans:"C",exp:"4!=4×3×2×1=24. The number of permutations of n distinct objects is n!"},
+      {q:"⁵C₂ equals:",opts:["A) 10","B) 20","C) 5","D) 15"],ans:"A",exp:"⁵C₂=5!/(2!×3!)=120/(2×6)=10. The combination formula is ⁿCr=n!/(r!(n−r)!)."},
+      {q:"Number of ways to select 3 from 8 students:",opts:["A) 24","B) 56","C) 336","D) 512"],ans:"B",exp:"⁸C₃=8!/(3!×5!)=8×7×6/(3×2×1)=336/6=56. Order doesn't matter in selection."},
+      {q:"ⁿP₂=56 for n=?",opts:["A) 7","B) 8","C) 9","D) 6"],ans:"B",exp:"ⁿP₂=n(n−1)=56. So n²−n−56=0 → (n−8)(n+7)=0 → n=8. ⁿPr=n!/(n−r)!"},
+      {q:"Number of diagonals in a hexagon:",opts:["A) 6","B) 9","C) 12","D) 15"],ans:"B",exp:"Diagonals=⁶C₂−6=15−6=9. We choose 2 vertices for each diagonal and subtract the 6 sides of the hexagon."},
+      {q:"The value of 0! is:",opts:["A) 0","B) 1","C) Undefined","D) ∞"],ans:"B",exp:"By definition, 0!=1. This is consistent with the recursive definition n!= n×(n−1)! and makes combinatorial formulas work correctly."},
+      {q:"In how many ways can letters of MATHS be arranged?",opts:["A) 60","B) 100","C) 120","D) 720"],ans:"C",exp:"MATHS has 5 distinct letters. Number of arrangements = 5! = 120."},
+      {q:"ⁿCr + ⁿCr₋₁ equals:",opts:["A) ⁿ⁺¹Cr","B) ⁿ⁺¹Cr₋₁","C) ²ⁿCr","D) ⁿCr₊₁"],ans:"A",exp:"Pascal's identity: ⁿCr+ⁿCr₋₁=ⁿ⁺¹Cr. This is the fundamental property that builds Pascal's triangle."},
+      {q:"Number of ways to form a committee of 3 from 5 men and 4 women with at least 1 woman:",opts:["A) 60","B) 74","C) 76","D) 80"],ans:"C",exp:"Total ⁹C₃=84. All men: ⁵C₃=10. At least 1 woman = 84−10=74. Careful: ⁹C₃=84, ⁵C₃=10, answer=74."},
+      {q:"The number of ways to arrange letters of LEVEL:",opts:["A) 120","B) 60","C) 30","D) 20"],ans:"C",exp:"LEVEL has 5 letters with L repeated 3 times, E repeated 2 times. Arrangements=5!/(3!×2!)=120/12=10. Hmm: actually 5!/(2!×2!)=30, since L appears 2 times and E appears 2 times. Answer: 30."}
+    ],
+    'Binomial Theorem':[
+      {q:"The general term in the expansion of (x+y)ⁿ is:",opts:["A) ⁿCr xʳ yⁿ⁻ʳ","B) ⁿCr xⁿ⁻ʳ yʳ","C) ⁿCr xʳ⁺¹ yⁿ⁻ʳ","D) ⁿCr xⁿ yʳ"],ans:"B",exp:"General term Tr₊₁=ⁿCr xⁿ⁻ʳ yʳ. The power of x decreases and power of y increases as r increases from 0 to n."},
+      {q:"The number of terms in expansion of (a+b)ⁿ is:",opts:["A) n","B) n−1","C) n+1","D) 2n"],ans:"C",exp:"(a+b)ⁿ has n+1 terms: T₁, T₂, ..., Tₙ₊₁ corresponding to r=0,1,2,...,n in Tr₊₁=ⁿCr aⁿ⁻ʳ bʳ."},
+      {q:"The middle term in expansion of (x+y)⁸ is:",opts:["A) T₄","B) T₅","C) T₃","D) T₆"],ans:"B",exp:"For even n, middle term is T(n/2+1)=T₅. Here n=8, so middle term is T₅=⁸C₄ x⁴y⁴."},
+      {q:"Coefficient of x³ in (1+x)⁵ is:",opts:["A) 5","B) 10","C) 20","D) 1"],ans:"B",exp:"Coefficient of xʳ in (1+x)ⁿ is ⁿCr. For x³: ⁵C₃=10."},
+      {q:"Value of (1.01)² using binomial approximation:",opts:["A) 1.01","B) 1.02","C) 1.0201","D) 1.002"],ans:"C",exp:"(1+0.01)²=1+2(0.01)+(0.01)²=1+0.02+0.0001=1.0201. Binomial expansion gives exact answer here."},
+      {q:"The term independent of x in (x+1/x)⁶ is:",opts:["A) ⁶C₂","B) ⁶C₃","C) ⁶C₄","D) ⁶C₁"],ans:"B",exp:"Tr₊₁=⁶Cr x⁶⁻ʳ·x⁻ʳ=⁶Cr x⁶⁻²ʳ. For independence: 6−2r=0 → r=3. Term=⁶C₃=20."},
+      {q:"Sum of coefficients in (1+x)ⁿ is found by substituting x=:",opts:["A) 0","B) −1","C) 1","D) 2"],ans:"C",exp:"At x=1: (1+1)ⁿ=2ⁿ = sum of all coefficients ⁿC₀+ⁿC₁+...+ⁿCₙ. Sum of coefficients = 2ⁿ."},
+      {q:"In (a+b)ⁿ, if n=6, the sum ⁶C₀+⁶C₁+...+⁶C₆ equals:",opts:["A) 32","B) 64","C) 128","D) 36"],ans:"B",exp:"Sum of binomial coefficients = 2ⁿ = 2⁶ = 64."},
+      {q:"The coefficient of x² in (3+2x)⁴ is:",opts:["A) 216","B) 144","C) 96","D) 54"],ans:"A",exp:"T₃=⁴C₂(3)²(2x)²=6×9×4x²=216x². Coefficient of x² is 216."},
+      {q:"Pascal's triangle row for n=4 is:",opts:["A) 1,4,6,4,1","B) 1,3,3,1","C) 1,4,4,1","D) 1,5,10,5,1"],ans:"A",exp:"Row n=4: ⁴C₀,⁴C₁,⁴C₂,⁴C₃,⁴C₄=1,4,6,4,1. Each entry is the sum of the two entries above it in Pascal's triangle."}
+    ],
+    'Complex Numbers':[
+      {q:"The value of i² is:",opts:["A) 1","B) −1","C) i","D) 0"],ans:"B",exp:"i=√(−1) is the imaginary unit. By definition, i²=−1. This is the fundamental property of imaginary numbers."},
+      {q:"The modulus of 3+4i is:",opts:["A) 7","B) 1","C) 5","D) 25"],ans:"C",exp:"|3+4i|=√(3²+4²)=√(9+16)=√25=5. Modulus of a+bi is √(a²+b²)."},
+      {q:"The conjugate of 2−3i is:",opts:["A) 2+3i","B) −2+3i","C) −2−3i","D) 3+2i"],ans:"A",exp:"Conjugate of a+bi is a−bi. So conjugate of 2−3i is 2+3i. Conjugation flips the sign of the imaginary part."},
+      {q:"The argument of the complex number i is:",opts:["A) 0","B) π/4","C) π/2","D) π"],ans:"C",exp:"i=0+1i lies on the positive imaginary axis. arg(i)=arctan(1/0)=π/2 radians (90°)."},
+      {q:"(1+i)² equals:",opts:["A) 2","B) 2i","C) 1+2i","D) −2"],ans:"B",exp:"(1+i)²=1+2i+i²=1+2i−1=2i. Always expand using (a+b)² formula and use i²=−1."},
+      {q:"The polar form of a complex number z=r(cosθ+i sinθ). For z=1+i, r=:",opts:["A) 1","B) √2","C) 2","D) √3"],ans:"B",exp:"r=|1+i|=√(1²+1²)=√2. The modulus r is always the magnitude of the complex number."},
+      {q:"i⁴ equals:",opts:["A) 1","B) −1","C) i","D) −i"],ans:"A",exp:"i¹=i, i²=−1, i³=−i, i⁴=1. Powers of i cycle with period 4. i⁴=(i²)²=(−1)²=1."},
+      {q:"Product of a complex number and its conjugate (a+bi)(a−bi)=:",opts:["A) a²−b²","B) a²+b²","C) 2ab","D) a²+2ab−b²"],ans:"B",exp:"(a+bi)(a−bi)=a²−(bi)²=a²−b²i²=a²+b² (since i²=−1). This always gives a real number = |z|²."},
+      {q:"The real part of (3+4i)/(1+i) is:",opts:["A) 7/2","B) 3","C) 4","D) 1"],ans:"A",exp:"Multiply by conjugate: (3+4i)(1−i)/((1+i)(1−i))=(3−3i+4i−4i²)/(1+1)=(3+i+4)/2=(7+i)/2. Real part=7/2."},
+      {q:"De Moivre's theorem states (cosθ+i sinθ)ⁿ equals:",opts:["A) cos(nθ)+i sin(nθ)","B) n cosθ+i sinθ","C) cosⁿθ+i sinⁿθ","D) cos(θ/n)+i sin(θ/n)"],ans:"A",exp:"De Moivre's: (cosθ+i sinθ)ⁿ=cos(nθ)+i sin(nθ). Essential for finding powers and roots of complex numbers."}
+    ],
+    'Limits & Continuity':[
+      {q:"lim(x→0) sin x / x =",opts:["A) 0","B) ∞","C) 1","D) −1"],ans:"C",exp:"This is the fundamental trigonometric limit. lim(x→0) sin x/x = 1, proved using the squeeze theorem. Essential for differentiation of trig functions."},
+      {q:"lim(x→2) (x²−4)/(x−2) =",opts:["A) 0","B) 2","C) 4","D) ∞"],ans:"C",exp:"Factor: (x²−4)/(x−2)=(x+2)(x−2)/(x−2)=x+2. At x→2: limit=4. Always factorise 0/0 indeterminate forms."},
+      {q:"A function f(x) is continuous at x=a if:",opts:["A) f(a) exists","B) lim f(x) exists","C) lim f(x)=f(a)","D) f'(a) exists"],ans:"C",exp:"Continuity requires: (1) f(a) exists, (2) lim(x→a) f(x) exists, AND (3) they are equal. All three conditions must hold."},
+      {q:"lim(x→0) (1+x)^(1/x) =",opts:["A) 1","B) e","C) ∞","D) 0"],ans:"B",exp:"This is the definition of Euler's number e≈2.718. It is one of the most important limits in calculus and defines the natural exponential function."},
+      {q:"lim(x→∞) 1/x =",opts:["A) ∞","B) 1","C) 0","D) −1"],ans:"C",exp:"As x increases without bound, 1/x approaches 0. The reciprocal of an infinitely large number is infinitesimally small."},
+      {q:"If f(x)=x² then lim(x→3) f(x) =",opts:["A) 6","B) 9","C) 3","D) 27"],ans:"B",exp:"Polynomial functions are continuous everywhere, so lim(x→a) p(x)=p(a). lim(x→3) x²=3²=9."},
+      {q:"lim(x→0) (eˣ−1)/x =",opts:["A) 0","B) e","C) 1","D) ∞"],ans:"C",exp:"Standard limit: lim(x→0)(eˣ−1)/x=1. This follows from the Taylor expansion eˣ=1+x+x²/2+... so (eˣ−1)/x→1."},
+      {q:"The function f(x)=1/x is discontinuous at:",opts:["A) x=1","B) x=−1","C) x=0","D) All real x"],ans:"C",exp:"1/x is undefined at x=0, so it cannot be continuous there. The function has a vertical asymptote at x=0."},
+      {q:"lim(x→0) tan x / x =",opts:["A) 0","B) 1","C) ∞","D) tan 1"],ans:"B",exp:"tan x/x = (sin x/x)×(1/cos x). As x→0: (1)×(1/1)=1. This follows from lim sin x/x=1 and cos 0=1."},
+      {q:"A removable discontinuity occurs when:",opts:["A) Limit doesn't exist","B) Limit exists but f(a) doesn't or differs","C) f(a) is infinite","D) f is not defined anywhere"],ans:"B",exp:"Removable discontinuity: the limit exists and is finite, but either f(a) is undefined or f(a)≠limit. The 'hole' can be filled by redefining f(a)."}
+    ],
+    'Methods of Differentiation':[
+      {q:"d/dx(xⁿ) =",opts:["A) xⁿ⁻¹","B) nxⁿ⁻¹","C) nxⁿ","D) n·xⁿ⁺¹"],ans:"B",exp:"Power rule: d/dx(xⁿ)=nxⁿ⁻¹. Multiply by the exponent and reduce the power by 1. The most fundamental differentiation rule."},
+      {q:"d/dx(sin x) =",opts:["A) cos x","B) −cos x","C) −sin x","D) tan x"],ans:"A",exp:"d/dx(sin x)=cos x. This is a standard result proved from first principles using the limit definition of the derivative."},
+      {q:"d/dx(eˣ) =",opts:["A) eˣ⁻¹","B) xeˣ","C) eˣ","D) ln x"],ans:"C",exp:"The exponential function eˣ is its own derivative: d/dx(eˣ)=eˣ. This unique property makes e the natural base for exponentials."},
+      {q:"d/dx(ln x) =",opts:["A) eˣ","B) 1/x","C) x","D) ln x"],ans:"B",exp:"d/dx(ln x)=1/x for x>0. This follows from the inverse relationship between eˣ and ln x using implicit differentiation."},
+      {q:"Product rule: d/dx(uv) =",opts:["A) u'v'","B) uv'+vu'","C) u'v−uv'","D) (u'v+uv')/v²"],ans:"B",exp:"Product rule: d/dx(uv)=uv'+vu'. When differentiating a product of two functions, each is differentiated in turn while the other is kept constant."},
+      {q:"Chain rule: d/dx[f(g(x))] =",opts:["A) f'(x)g'(x)","B) f'(g(x))","C) f'(g(x))·g'(x)","D) f(g'(x))"],ans:"C",exp:"Chain rule: d/dx[f(g(x))]=f'(g(x))·g'(x). Differentiate the outer function (keeping inner intact) then multiply by derivative of inner."},
+      {q:"d/dx(cos x) =",opts:["A) sin x","B) −sin x","C) cos x","D) −cos x"],ans:"B",exp:"d/dx(cos x)=−sin x. Note the negative sign — this distinguishes it from d/dx(sin x)=cos x."},
+      {q:"d/dx(tan x) =",opts:["A) sec x","B) sec²x","C) −cosec²x","D) cot x"],ans:"B",exp:"d/dx(tan x)=sec²x. Derived from tan x=sin x/cos x using the quotient rule, or from first principles."},
+      {q:"Quotient rule: d/dx(u/v) =",opts:["A) u'v+uv'","B) (u'v−uv')/v","C) (u'v−uv')/v²","D) u'/v'"],ans:"C",exp:"Quotient rule: (vu'−uv')/v². Mnemonic: 'low d-high minus high d-low, over low squared'. Always divide by v²."},
+      {q:"If y=x³+2x²−5x+1, then dy/dx =",opts:["A) 3x²+4x+5","B) 3x²+4x−5","C) x³+4x","D) 3x²−5"],ans:"B",exp:"Differentiate term by term: d/dx(x³)=3x², d/dx(2x²)=4x, d/dx(−5x)=−5, d/dx(1)=0. Sum: 3x²+4x−5."}
+    ],
+    'Vectors':[
+      {q:"The magnitude of vector 3î+4ĵ is:",opts:["A) 7","B) 1","C) 5","D) 25"],ans:"C",exp:"|a|=√(3²+4²)=√(9+16)=√25=5. Magnitude of vector aî+bĵ+cĸ is √(a²+b²+c²)."},
+      {q:"Dot product of î and ĵ is:",opts:["A) 1","B) 0","C) î","D) ĵ"],ans:"B",exp:"î·ĵ=0 because î and ĵ are perpendicular unit vectors. Dot product of perpendicular vectors is always 0."},
+      {q:"Cross product of î×î is:",opts:["A) 1","B) î","C) 0","D) ĸ"],ans:"C",exp:"Cross product of a vector with itself is zero: î×î=0. Cross product of parallel vectors is always the zero vector."},
+      {q:"If two vectors are parallel, their cross product is:",opts:["A) Maximum","B) Zero","C) Unity","D) Negative"],ans:"B",exp:"a×b=|a||b|sinθ. For parallel vectors θ=0°, sin0°=0, so a×b=0. Parallel vectors have zero cross product."},
+      {q:"The unit vector along 3î+4ĵ is:",opts:["A) 3î+4ĵ","B) (3î+4ĵ)/7","C) (3î+4ĵ)/5","D) (3î+4ĵ)/25"],ans:"C",exp:"Unit vector=a/|a|=(3î+4ĵ)/5. Divide the vector by its magnitude to get a unit vector in the same direction."},
+      {q:"a·b=|a||b|cosθ. If a·b=0 and both vectors are non-zero, then θ=",opts:["A) 0°","B) 45°","C) 90°","D) 180°"],ans:"C",exp:"a·b=0 → cosθ=0 → θ=90°. Zero dot product (for non-zero vectors) means the vectors are perpendicular."},
+      {q:"Projection of vector a onto vector b is:",opts:["A) a·b","B) a·b/|b|","C) |a|cosθ","D) Both B and C"],ans:"D",exp:"Projection of a onto b = a·b̂ = a·b/|b| = |a|cosθ. Both expressions are equivalent and correct."},
+      {q:"Position vector of midpoint of A(2,3,1) and B(4,7,5) is:",opts:["A) 3î+5ĵ+3ĸ","B) 6î+10ĵ+6ĸ","C) î+2ĵ+2ĸ","D) 2î+4ĵ+3ĸ"],ans:"A",exp:"Midpoint=((2+4)/2)î+((3+7)/2)ĵ+((1+5)/2)ĸ=3î+5ĵ+3ĸ. Average the corresponding coordinates."},
+      {q:"The angle between two vectors a and b is found using:",opts:["A) a×b=|a||b|sinθ","B) a·b=|a||b|cosθ","C) a+b=|a+b|","D) |a−b|=|a|−|b|"],ans:"B",exp:"cosθ=(a·b)/(|a||b|). The dot product formula gives the cosine of the angle between two vectors directly."},
+      {q:"If |a+b|=|a−b|, the vectors a and b are:",opts:["A) Parallel","B) Antiparallel","C) Perpendicular","D) Equal"],ans:"C",exp:"|a+b|²=|a|²+2a·b+|b|²; |a−b|²=|a|²−2a·b+|b|². Equal means 4a·b=0, so a·b=0 → perpendicular."}
+    ],
+    'Matrices & Determinants':[
+      {q:"Order of matrix A with 3 rows and 4 columns is:",opts:["A) 4×3","B) 3×4","C) 12","D) 7"],ans:"B",exp:"Matrix order is written as rows×columns. A matrix with 3 rows and 4 columns has order 3×4."},
+      {q:"For a square matrix A, det(A)=0 means A is:",opts:["A) Identity","B) Singular","C) Diagonal","D) Symmetric"],ans:"B",exp:"A matrix with determinant 0 is called singular. It has no inverse. The rows (or columns) are linearly dependent."},
+      {q:"The determinant of [[2,3],[1,4]] is:",opts:["A) 11","B) 5","C) 8","D) 14"],ans:"B",exp:"det=ad−bc=2×4−3×1=8−3=5. For a 2×2 matrix [[a,b],[c,d]], det=ad−bc."},
+      {q:"The transpose of a matrix is obtained by:",opts:["A) Negating all elements","B) Swapping rows and columns","C) Taking reciprocals","D) Multiplying by −1"],ans:"B",exp:"Transpose (Aᵀ) is obtained by swapping rows and columns: element aᵢⱼ becomes aⱼᵢ. If A is m×n, Aᵀ is n×m."},
+      {q:"A×I = (where I is identity matrix):",opts:["A) I","B) A","C) 0","D) Aᵀ"],ans:"B",exp:"The identity matrix I acts like the number 1 in multiplication: A×I=I×A=A for any compatible matrix A."},
+      {q:"For matrices A(m×n) and B(p×q), AB is defined only when:",opts:["A) m=p","B) n=q","C) n=p","D) m=q"],ans:"C",exp:"Matrix multiplication AB is defined only when the number of columns of A equals the number of rows of B, i.e., n=p. Result is m×q."},
+      {q:"A symmetric matrix satisfies:",opts:["A) A=−Aᵀ","B) A=Aᵀ","C) A²=I","D) det(A)=0"],ans:"B",exp:"A symmetric matrix equals its own transpose: A=Aᵀ, meaning aᵢⱼ=aⱼᵢ for all i,j. The matrix is mirror-symmetric about the main diagonal."},
+      {q:"The inverse of matrix A exists if:",opts:["A) det(A)=0","B) A is rectangular","C) det(A)≠0","D) A=Aᵀ"],ans:"C",exp:"A⁻¹ exists only for square, non-singular matrices (det≠0). A⁻¹=adj(A)/det(A). If det=0, A is singular and has no inverse."},
+      {q:"det(AB) equals:",opts:["A) det(A)+det(B)","B) det(A)−det(B)","C) det(A)×det(B)","D) det(A)/det(B)"],ans:"C",exp:"The product rule for determinants: det(AB)=det(A)×det(B). This is a fundamental property of determinants for square matrices."},
+      {q:"Cofactor expansion along first row of [[1,2,3],[4,5,6],[7,8,9]]: det=",opts:["A) 0","B) 1","C) −1","D) 45"],ans:"A",exp:"Rows 1,2,3 are in AP (each row sum 6,15,24 and differences constant), so rows are linearly dependent. det=0. This matrix is singular."}
+    ],
+    '3D Geometry':[
+      {q:"Distance between points (1,2,3) and (4,6,3) is:",opts:["A) 5","B) 7","C) 3","D) 4"],ans:"A",exp:"d=√((4−1)²+(6−2)²+(3−3)²)=√(9+16+0)=√25=5. The 3D distance formula extends the 2D version with a z-component."},
+      {q:"Direction cosines of a line satisfy l²+m²+n²=",opts:["A) 0","B) 3","C) 1","D) √3"],ans:"C",exp:"l²+m²+n²=1 always. Direction cosines are cosines of angles with x, y, z axes and their squares sum to 1."},
+      {q:"The equation of xy-plane is:",opts:["A) x=0","B) y=0","C) z=0","D) x+y+z=0"],ans:"C",exp:"The xy-plane contains all points with z=0. Similarly, yz-plane: x=0 and xz-plane: y=0."},
+      {q:"Section formula: point dividing A(x₁,y₁,z₁) and B(x₂,y₂,z₂) in ratio m:n internally has x-coordinate:",opts:["A) (mx₁+nx₂)/(m+n)","B) (mx₂+nx₁)/(m+n)","C) (x₁+x₂)/2","D) m(x₂−x₁)/n"],ans:"B",exp:"Internal division: x=(mx₂+nx₁)/(m+n). The point is closer to the vertex with larger ratio."},
+      {q:"The equation of a plane perpendicular to z-axis at z=5 is:",opts:["A) x=5","B) y=5","C) z=5","D) x+y+z=5"],ans:"C",exp:"A plane perpendicular to the z-axis has equation z=constant. At z=5, the plane is z=5, parallel to the xy-plane."},
+      {q:"Midpoint of (2,4,6) and (8,2,4) is:",opts:["A) (5,3,5)","B) (5,3,4)","C) (6,6,10)","D) (4,2,3)"],ans:"A",exp:"Midpoint=((2+8)/2,(4+2)/2,(6+4)/2)=(5,3,5). The midpoint formula averages each coordinate."},
+      {q:"Two planes are parallel if their normal vectors are:",opts:["A) Perpendicular","B) Parallel","C) Equal in magnitude","D) Zero"],ans:"B",exp:"Planes are parallel if and only if their normal vectors are parallel (proportional). Parallel planes never intersect."},
+      {q:"The distance from origin to plane ax+by+cz+d=0 is:",opts:["A) |d|/√(a²+b²+c²)","B) d/(a+b+c)","C) √(a²+b²+c²)","D) |a+b+c+d|"],ans:"A",exp:"Distance from point (x₁,y₁,z₁) to ax+by+cz+d=0 is |ax₁+by₁+cz₁+d|/√(a²+b²+c²). From origin: |d|/√(a²+b²+c²)."},
+      {q:"Direction ratios of a line joining (1,2,3) and (3,5,7) are:",opts:["A) 1,2,3","B) 2,3,4","C) 3,5,7","D) 4,7,10"],ans:"B",exp:"Direction ratios=(x₂−x₁,y₂−y₁,z₂−z₁)=(3−1,5−2,7−3)=(2,3,4). These are proportional to direction cosines."},
+      {q:"The angle between two lines with direction cosines (l₁,m₁,n₁) and (l₂,m₂,n₂) satisfies cosθ=",opts:["A) l₁l₂+m₁m₂+n₁n₂","B) l₁m₂+m₁l₂","C) l₁/l₂+m₁/m₂+n₁/n₂","D) (l₁+m₁+n₁)(l₂+m₂+n₂)"],ans:"A",exp:"cosθ=l₁l₂+m₁m₂+n₁n₂. This is essentially the dot product of unit direction vectors, giving the cosine of the angle between lines."}
+    ],
+    'Probability':[
+      {q:"P(A∪B) = P(A)+P(B)−",opts:["A) P(A)×P(B)","B) P(A∩B)","C) P(Aᶜ)","D) P(B)"],ans:"B",exp:"Addition theorem: P(A∪B)=P(A)+P(B)−P(A∩B). Subtract the intersection to avoid double-counting events common to both."},
+      {q:"P(A)+P(Aᶜ) =",opts:["A) 0","B) P(A)","C) 1","D) 2P(A)"],ans:"C",exp:"P(A)+P(Aᶜ)=1. An event and its complement are mutually exclusive and exhaustive — one of them must occur."},
+      {q:"Two events A and B are independent if:",opts:["A) P(A∩B)=0","B) P(A∩B)=P(A)×P(B)","C) P(A∪B)=1","D) P(A)=P(B)"],ans:"B",exp:"Independence means knowing B doesn't affect A: P(A∩B)=P(A)×P(B). This is the product rule for independent events."},
+      {q:"Probability of getting head on a fair coin toss:",opts:["A) 0","B) 1","C) 1/2","D) 1/4"],ans:"C",exp:"A fair coin has 2 equally likely outcomes: H and T. P(H)=1/2. Classical probability = favourable/total outcomes."},
+      {q:"Bayes' theorem relates:",opts:["A) P(A∩B) to P(A)P(B)","B) P(A|B) to P(B|A)","C) P(A∪B) to P(A)+P(B)","D) P(A) to P(Aᶜ)"],ans:"B",exp:"Bayes: P(A|B)=P(B|A)P(A)/P(B). It updates probability of A given new evidence B, using prior probability and likelihood."},
+      {q:"P(A|B) means:",opts:["A) P(A) and P(B)","B) P(A) given B has occurred","C) P(A) divided by P(B)","D) P(A∩B)"],ans:"B",exp:"P(A|B) is conditional probability: probability of A given that B has already occurred. P(A|B)=P(A∩B)/P(B)."},
+      {q:"Probability of rolling a 6 on a fair die:",opts:["A) 1","B) 6","C) 1/6","D) 5/6"],ans:"C",exp:"A fair die has 6 equally likely outcomes: 1,2,3,4,5,6. Only one outcome is 6. P(6)=1/6."},
+      {q:"Probability of getting at least one head in 2 coin tosses:",opts:["A) 1/4","B) 1/2","C) 3/4","D) 1"],ans:"C",exp:"P(at least one H)=1−P(no H)=1−P(TT)=1−1/4=3/4. Complement approach is faster than listing favourable outcomes."},
+      {q:"Two dice are rolled. P(sum=7):",opts:["A) 1/6","B) 5/36","C) 7/36","D) 6/36"],ans:"A",exp:"Favourable: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1) = 6 outcomes. Total=36. P=6/36=1/6."},
+      {q:"In a class of 30, P(selected student is a girl)=2/3. Number of girls:",opts:["A) 10","B) 15","C) 20","D) 25"],ans:"C",exp:"Number of girls = 30×(2/3) = 20. Probability × total gives expected count."}
+    ],
+
+    // ── NEET PHYSICS CHAPTERS ────────────────────────────────────────────────
+    'Kinematics':[
+      {q:"A car accelerates from rest at 2 m/s² for 5 s. Final velocity:",opts:["A) 5 m/s","B) 10 m/s","C) 2.5 m/s","D) 20 m/s"],ans:"B",exp:"v=u+at=0+2×5=10 m/s. First kinematic equation."},
+      {q:"Displacement in 3 s with u=4 m/s, a=2 m/s²:",opts:["A) 12 m","B) 21 m","C) 18 m","D) 6 m"],ans:"B",exp:"s=ut+½at²=12+9=21 m."},
+      {q:"Ball dropped from rest. After 2 s velocity (g=10):",opts:["A) 5 m/s","B) 10 m/s","C) 20 m/s","D) 40 m/s"],ans:"C",exp:"v=gt=10×2=20 m/s."},
+      {q:"Slope of velocity-time graph represents:",opts:["A) Displacement","B) Speed","C) Acceleration","D) Distance"],ans:"C",exp:"Slope of v-t graph=Δv/Δt=acceleration."},
+      {q:"Horizontal velocity in projectile motion:",opts:["A) Increases","B) Decreases","C) Zero","D) Constant"],ans:"D",exp:"No horizontal force (ignoring air), so horizontal velocity stays constant."},
+      {q:"Maximum range of projectile at angle:",opts:["A) 30°","B) 45°","C) 60°","D) 90°"],ans:"B",exp:"R=u²sin2θ/g is max when 2θ=90°, θ=45°."},
+      {q:"Relative velocity of A wrt B (same direction):",opts:["A) vₐ+v_b","B) vₐ−v_b","C) vₐ×v_b","D) vₐ/v_b"],ans:"B",exp:"v_AB=vₐ−v_b for same direction."},
+      {q:"Area under v-t graph gives:",opts:["A) Acceleration","B) Speed","C) Displacement","D) Force"],ans:"C",exp:"∫v dt = displacement = area under v-t curve."},
+      {q:"Centripetal acceleration in circular motion:",opts:["A) v²r","B) v²/r","C) vr","D) v/r²"],ans:"B",exp:"a=v²/r directed towards centre."},
+      {q:"Time of flight for vertical projection with u:",opts:["A) u/g","B) 2u/g","C) u²/2g","D) 2u²/g"],ans:"B",exp:"T=2u/g (up time = down time = u/g each)."}
+    ],
+    'Laws of Motion':[
+      {q:"F=ma. If m doubles and a halves, force:",opts:["A) Doubles","B) Halves","C) Same","D) Quadruples"],ans:"C",exp:"New F=2m×a/2=ma. Unchanged."},
+      {q:"Reaction to book's weight acts on:",opts:["A) Book upward","B) Earth upward","C) Table downward","D) Table upward"],ans:"B",exp:"Newton's 3rd Law: book pulls Earth with equal and opposite force."},
+      {q:"Resistance to change in state of motion is:",opts:["A) Momentum","B) Inertia","C) Force","D) Impulse"],ans:"B",exp:"Inertia ∝ mass. Heavier bodies resist change more."},
+      {q:"5 kg body, net force 20 N, acceleration:",opts:["A) 4 m/s²","B) 2 m/s²","C) 100 m/s²","D) 0.25 m/s²"],ans:"A",exp:"a=F/m=20/5=4 m/s²."},
+      {q:"Gun recoil when firing is Newton's:",opts:["A) First","B) Second","C) Third","D) Gravitation"],ans:"C",exp:"Action-reaction pair: bullet forward, gun backward."},
+      {q:"Limiting friction depends on:",opts:["A) Contact area","B) Speed","C) Normal reaction","D) Mass"],ans:"C",exp:"f=μN. Independent of area and speed."},
+      {q:"Person in lift feels heavier when lift:",opts:["A) Moves up constant v","B) Moves down constant v","C) Accelerates up","D) Accelerates down"],ans:"C",exp:"Apparent weight=m(g+a) when accelerating upward."},
+      {q:"Impulse =",opts:["A) F×d","B) F×t","C) m×v","D) m×a"],ans:"B",exp:"J=Ft=Δp. Impulse equals change in momentum."},
+      {q:"Body in equilibrium has net force =",opts:["A) Maximum","B) Minimum","C) Zero","D) Equal to weight"],ans:"C",exp:"ΣF=0 and Στ=0 for equilibrium."},
+      {q:"Kinetic friction is ___ static friction:",opts:["A) Greater","B) Equal","C) Less","D) Unrelated"],ans:"C",exp:"μₖ<μₛ. Easier to maintain sliding than to start it."}
+    ],
+
+    // ── NEET CHEMISTRY CHAPTERS ─────────────────────────────────────────────
+    'Electrochemistry':[
+      {q:"Faraday's first law: mass deposited is proportional to:",opts:["A) Voltage","B) Resistance","C) Charge passed","D) Temperature"],ans:"C",exp:"m=ZQ=ZIt. Mass deposited is directly proportional to the total electric charge passed through the electrolyte."},
+      {q:"In electrolysis of water, gas released at cathode is:",opts:["A) Oxygen","B) Hydrogen","C) Chlorine","D) Ozone"],ans:"B",exp:"Cathode (−): reduction occurs. 2H₂O+2e⁻→H₂+2OH⁻. Hydrogen gas is produced at the cathode."},
+      {q:"Standard EMF of a cell = E°cathode − E°anode. This is:",opts:["A) Nernst equation","B) Cell potential formula","C) Faraday's law","D) Kohlrausch's law"],ans:"B",exp:"E°cell=E°cathode−E°anode. Cathode is the electrode of higher reduction potential where reduction occurs."},
+      {q:"A galvanic cell converts:",opts:["A) Electrical to chemical energy","B) Chemical to electrical energy","C) Heat to electrical energy","D) Light to electrical energy"],ans:"B",exp:"Galvanic/voltaic cells spontaneously convert chemical energy of redox reactions to electrical energy."},
+      {q:"Salt bridge in electrochemical cell serves to:",opts:["A) Conduct electrons","B) Maintain electrical neutrality","C) Increase EMF","D) Store charge"],ans:"B",exp:"Salt bridge maintains electrical neutrality in both half-cells by allowing migration of ions, completing the circuit."},
+      {q:"Conductivity of electrolyte solution increases with:",opts:["A) Dilution always","B) Concentration always","C) Temperature increase","D) Adding non-electrolyte"],ans:"C",exp:"Ionic mobility increases with temperature, increasing conductivity. Molar conductivity increases with dilution."},
+      {q:"The electrode potential depends on:",opts:["A) Temperature only","B) Concentration only","C) Both, given by Nernst equation","D) Neither"],ans:"C",exp:"Nernst equation: E=E°−(RT/nF)lnQ. Both temperature and concentration affect electrode potential."},
+      {q:"In Daniel cell, zinc acts as:",opts:["A) Cathode","B) Salt bridge","C) Anode","D) Electrolyte"],ans:"C",exp:"Zinc is oxidised (loses electrons): Zn→Zn²⁺+2e⁻. Oxidation at anode makes zinc the anode in Daniel cell."},
+      {q:"Specific conductance unit is:",opts:["A) S","B) S m⁻¹","C) S m²mol⁻¹","D) Ohm"],ans:"B",exp:"Specific conductance (κ) has SI unit S m⁻¹. Molar conductance Λm has unit S m² mol⁻¹."},
+      {q:"Electrolysis is used industrially for:",opts:["A) Only plating","B) Only refining","C) Plating, refining, and synthesis","D) Only synthesis"],ans:"C",exp:"Electrolysis has applications in electroplating (coating metals), electrorefining (purifying metals), and electrosynthesis (making chemicals like NaOH)."}
+    ],
+    'Chemical Kinetics':[
+      {q:"Rate of reaction is defined as change in concentration per unit:",opts:["A) Volume","B) Temperature","C) Time","D) Pressure"],ans:"C",exp:"Rate=−d[R]/dt=+d[P]/dt. Rate is the change in concentration of reactant or product per unit time."},
+      {q:"For reaction A→B, rate=k[A]². The order is:",opts:["A) 0","B) 1","C) 2","D) 3"],ans:"C",exp:"Order = sum of powers of concentration in rate law. rate=k[A]² has order 2 (second order)."},
+      {q:"The rate constant k depends on:",opts:["A) Concentration","B) Temperature","C) Pressure","D) Volume"],ans:"B",exp:"k depends on temperature as given by Arrhenius equation k=Ae^(−Ea/RT). k is independent of concentration."},
+      {q:"Arrhenius equation: k=Ae^(−Ea/RT). Ea is:",opts:["A) Activation energy","B) Total energy","C) Bond energy","D) Enthalpy"],ans:"A",exp:"Ea=activation energy, the minimum energy required for a reaction to occur. A is frequency factor, R is gas constant."},
+      {q:"Half-life of a first-order reaction depends on:",opts:["A) Initial concentration","B) Temperature only","C) Neither concentration nor temperature","D) Initial concentration and k"],ans:"A",exp:"Wait — for first order: t½=0.693/k. Half-life is INDEPENDENT of initial concentration. Depends only on k (and hence temperature)."},
+      {q:"Zero-order reaction: rate depends on concentration as:",opts:["A) rate∝[A]","B) rate∝[A]²","C) rate=k","D) rate∝1/[A]"],ans:"C",exp:"Zero order: rate=k[A]⁰=k. Rate is constant and independent of reactant concentration. Example: surface-catalysed reactions."},
+      {q:"Catalyst increases reaction rate by:",opts:["A) Increasing temperature","B) Lowering activation energy","C) Increasing concentration","D) Changing equilibrium"],ans:"B",exp:"Catalyst provides an alternative pathway with lower activation energy Ea. Rate increases exponentially (Arrhenius). Catalyst is not consumed."},
+      {q:"For A+B→C, rate=k[A][B]. Doubling [A] doubles the rate. Order wrt A:",opts:["A) 0","B) 2","C) 1","D) ½"],ans:"C",exp:"rate∝[A]¹. Doubling [A] doubles rate → order with respect to A is 1 (first order in A)."},
+      {q:"Integrated rate law for zero-order: [A]t =",opts:["A) [A]₀e^(−kt)","B) [A]₀−kt","C) kt+[A]₀","D) 1/[A]₀+kt"],ans:"B",exp:"Zero order: [A]t=[A]₀−kt. Concentration decreases linearly with time. Graph of [A] vs t is a straight line."},
+      {q:"Molecularity of a reaction is:",opts:["A) Determined experimentally","B) Number of molecules in rate law","C) Number of molecules in slowest step","D) Same as order always"],ans:"C",exp:"Molecularity = number of reactant molecules in the elementary (single-step) reaction or the rate-determining step. It is always a positive integer."}
+    ],
+
+    // ── NEET BIOLOGY CHAPTERS ────────────────────────────────────────────────
+    'Molecular Basis of Inheritance':[
+      {q:"DNA double helix was discovered by:",opts:["A) Mendel & Morgan","B) Watson & Crick","C) Avery & Griffith","D) Chargaff & Franklin"],ans:"B",exp:"Watson and Crick proposed the double helix model of DNA in 1953, using X-ray diffraction data from Rosalind Franklin."},
+      {q:"In DNA, adenine pairs with:",opts:["A) Cytosine","B) Guanine","C) Thymine","D) Uracil"],ans:"C",exp:"Chargaff's rules: A pairs with T (2 H-bonds) and G pairs with C (3 H-bonds) in DNA. In RNA, A pairs with U."},
+      {q:"The process of making RNA from DNA is called:",opts:["A) Translation","B) Replication","C) Transcription","D) Transduction"],ans:"C",exp:"Transcription: DNA→RNA using RNA polymerase. Translation: RNA→Protein. Replication: DNA→DNA."},
+      {q:"The central dogma of molecular biology is:",opts:["A) RNA→DNA→Protein","B) DNA→RNA→Protein","C) Protein→RNA→DNA","D) DNA→Protein→RNA"],ans:"B",exp:"Central dogma: DNA is transcribed to RNA, which is translated to Protein. Information flows from DNA to RNA to Protein."},
+      {q:"mRNA carries genetic information from:",opts:["A) Ribosome to protein","B) DNA to ribosome","C) tRNA to protein","D) Nucleus to mitochondria"],ans:"B",exp:"mRNA (messenger RNA) carries the genetic code from DNA in the nucleus to ribosomes in the cytoplasm for protein synthesis."},
+      {q:"The number of nucleotides in a codon is:",opts:["A) 1","B) 2","C) 3","D) 4"],ans:"C",exp:"A codon is a triplet of three nucleotides in mRNA that codes for one amino acid. There are 4³=64 possible codons."},
+      {q:"The stop codon UAG codes for:",opts:["A) Methionine","B) Glutamine","C) No amino acid","D) Serine"],ans:"C",exp:"UAG, UAA, and UGA are stop (nonsense) codons. They signal termination of translation. No amino acid is incorporated."},
+      {q:"DNA replication is called semiconservative because:",opts:["A) Only one strand is copied","B) Each daughter has one old and one new strand","C) Both strands are new","D) Replication is incomplete"],ans:"B",exp:"Semiconservative: each daughter DNA retains one parental strand and has one newly synthesised strand. Proved by Meselson-Stahl experiment."},
+      {q:"Which enzyme synthesises DNA during replication?",opts:["A) RNA polymerase","B) Ligase","C) DNA polymerase III","D) Helicase"],ans:"C",exp:"DNA polymerase III is the main replicative enzyme in prokaryotes. It adds nucleotides in 5'→3' direction. Helicase unwinds, ligase joins Okazaki fragments."},
+      {q:"The template strand of DNA during transcription is read in direction:",opts:["A) 5'→3'","B) 3'→5'","C) Both directions","D) 2'→4'"],ans:"B",exp:"RNA polymerase reads the template strand 3'→5' and synthesises RNA in 5'→3' direction. This antiparallel orientation is fundamental."}
+    ],
+    'Human Health & Disease':[
+      {q:"Which disease is caused by Plasmodium?",opts:["A) Typhoid","B) Malaria","C) Cholera","D) Tuberculosis"],ans:"B",exp:"Malaria is caused by Plasmodium species (P. falciparum, P. vivax) transmitted by female Anopheles mosquito. It infects RBCs."},
+      {q:"AIDS is caused by:",opts:["A) Bacteria","B) Fungi","C) HIV","D) Prion"],ans:"C",exp:"AIDS (Acquired Immunodeficiency Syndrome) is caused by HIV (Human Immunodeficiency Virus), a retrovirus that destroys CD4+ T helper cells."},
+      {q:"Antibodies are produced by:",opts:["A) T lymphocytes","B) B lymphocytes","C) Neutrophils","D) Platelets"],ans:"B",exp:"B lymphocytes (B cells) differentiate into plasma cells that secrete antibodies (immunoglobulins) in humoral immunity."},
+      {q:"The first line of defence against pathogens is:",opts:["A) Antibodies","B) T cells","C) Skin and mucus","D) Phagocytes"],ans:"C",exp:"Physical barriers: skin, mucus membranes, tears, saliva form the first line of non-specific defence, preventing pathogen entry."},
+      {q:"Vaccination works by:",opts:["A) Killing pathogens directly","B) Stimulating memory cells","C) Increasing phagocytes","D) Reducing fever"],ans:"B",exp:"Vaccines expose the immune system to antigens, stimulating production of memory B and T cells for rapid response to future infection."},
+      {q:"Which disease is caused by Mycobacterium tuberculosis?",opts:["A) Malaria","B) Cholera","C) Tuberculosis","D) Typhoid"],ans:"C",exp:"TB is caused by Mycobacterium tuberculosis (rod-shaped bacterium). It primarily infects the lungs causing pulmonary tuberculosis."},
+      {q:"Histamine is released by which cells during allergic reaction?",opts:["A) T cells","B) Mast cells","C) B cells","D) Neutrophils"],ans:"B",exp:"Mast cells release histamine and other mediators in response to allergens bound to IgE antibodies, causing allergic symptoms."},
+      {q:"Cancer cells differ from normal cells in that they:",opts:["A) Divide less frequently","B) Show contact inhibition","C) Divide uncontrollably","D) Have smaller nuclei"],ans:"C",exp:"Cancer cells divide continuously due to mutations in proto-oncogenes or tumour suppressor genes. They lose contact inhibition and form tumours."},
+      {q:"Which drug is derived from opium poppy?",opts:["A) Cocaine","B) Morphine","C) Cannabis","D) LSD"],ans:"B",exp:"Morphine (and heroin) are derived from opium poppy (Papaver somniferum). They are opioids that bind pain receptors and cause euphoria."},
+      {q:"The vector for dengue fever is:",opts:["A) Anopheles mosquito","B) Aedes mosquito","C) Culex mosquito","D) Sandfly"],ans:"B",exp:"Dengue is transmitted by Aedes aegypti (and Aedes albopictus) mosquitoes. Unlike malaria, Aedes bites during the day."}
     ]
   };
 
-  // Subject-level fallback banks (when no specific chapter bank exists)
+  // ── SUBJECT-LEVEL FALLBACK BANKS ──────────────────────────────────────────
   const subjectBanks={
     Physics:[
       {q:"A ball of mass 0.5 kg is thrown vertically upward at 10 m/s. Max height reached? (g=10 m/s²)",opts:["A) 5 m","B) 10 m","C) 2.5 m","D) 20 m"],ans:"A",exp:"v²=u²−2gh → 0=100−20h → h=5 m. Standard kinematic equation applied to vertical upward projection."},

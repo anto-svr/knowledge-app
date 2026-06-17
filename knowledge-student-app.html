@@ -400,10 +400,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
 // ─── CONFIG ────────────────────────────────────────────────
-const HARDCODED_API_KEY = '';  // paste your sk-ant-... key here, or enter via login screen
-const API_ENDPOINT = 'https://api.anthropic.com/v1/messages';
+// Set PROXY_URL to your Render.com proxy URL after deploying.
+// Example: 'https://knowledge-proxy-xxxx.onrender.com'
+// Leave empty to fall back to direct API mode (student enters key).
+const PROXY_URL = 'https://knowledge-proxy.onrender.com';
+
+// Only used in direct mode (when PROXY_URL is empty)
+const HARDCODED_API_KEY = '';
 const MODEL = 'claude-sonnet-4-6';
 const TOTAL_Q = 30;
+
+// Auto-selects endpoint: proxy (no CORS, key hidden) or direct API
+const API_ENDPOINT = PROXY_URL
+  ? PROXY_URL + '/api/ask'
+  : 'https://api.anthropic.com/v1/messages';
 
 // ─── CHAPTER BANK ──────────────────────────────────────────
 const CHAPTERS = {
@@ -640,16 +650,26 @@ Return all ${TOTAL_Q} objects.`;
 }
 
 async function callAPI(prompt){
+  // Build headers based on mode: proxy (key hidden server-side) or direct (key in browser)
+  const headers={'Content-Type':'application/json'};
+  if(!PROXY_URL){
+    headers['x-api-key']=getApiKey();
+    headers['anthropic-version']='2023-06-01';
+    headers['anthropic-dangerous-direct-browser-calls']='true';
+  }
   const resp=await fetch(API_ENDPOINT,{
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-calls':'true'},
+    headers,
     body:JSON.stringify({model:MODEL,max_tokens:8000,messages:[{role:'user',content:prompt}]})
   });
-  if(!resp.ok){ const e=await resp.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${resp.status}`); }
+  if(!resp.ok){
+    const e=await resp.json().catch(()=>({}));
+    throw new Error(e.error?.message||e.error||`HTTP ${resp.status}`);
+  }
   const data=await resp.json();
   let text=data.content.map(c=>c.text||'').join('');
   text=text.replace(/```json|```/g,'').trim();
-  const si=text.indexOf('['), ei=text.lastIndexOf(']');
+  const si=text.indexOf('['),ei=text.lastIndexOf(']');
   if(si===-1||ei===-1) throw new Error('Response did not contain a JSON array');
   const arr=JSON.parse(text.substring(si,ei+1));
   if(!Array.isArray(arr)||arr.length<5) throw new Error('Too few questions in response');
@@ -1150,7 +1170,9 @@ async function showExplanation(){
   }
   try{
     const prompt=`A class 12 Tamil Nadu student preparing for ${state.exam} answered a ${state.subject} question.\n\nQuestion: ${q.q}\nOptions: ${q.opts.join(' | ')}\nStudent selected: ${ans}\nCorrect answer: ${q.ans}\n\nWrite a clear, encouraging 3-sentence explanation. Explain why the correct answer is right and mention the key concept or formula. If the student was wrong, gently explain why. Use simple language for a class 12 student.`;
-    const resp=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-calls':'true'},body:JSON.stringify({model:MODEL,max_tokens:350,messages:[{role:'user',content:prompt}]})});
+    const explainHeaders={'Content-Type':'application/json'};
+    if(!PROXY_URL){explainHeaders['x-api-key']=getApiKey();explainHeaders['anthropic-version']='2023-06-01';explainHeaders['anthropic-dangerous-direct-browser-calls']='true';}
+    const resp=await fetch(API_ENDPOINT,{method:'POST',headers:explainHeaders,body:JSON.stringify({model:MODEL,max_tokens:350,messages:[{role:'user',content:prompt}]})});
     const data=await resp.json();
     const txt=data.content.map(c=>c.text||'').join('');
     expBox.innerHTML=`<strong style="color:var(--accent3)">💡 Explanation</strong><br><br>${txt}<br><br><span style="font-size:.78rem;color:var(--muted)">Correct answer: <strong>${q.ans}</strong></span>`;

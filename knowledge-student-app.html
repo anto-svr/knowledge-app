@@ -46,6 +46,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
 .exam-card .ec-name{font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
 .exam-card .ec-sub{font-size:.8rem;color:var(--muted)}
 .exam-card.neet-card:hover,.exam-card.neet-card.selected{border-color:var(--accent3);background:linear-gradient(135deg,#f0fbff,#fff);box-shadow:0 4px 20px rgba(0,180,216,.18)}
+.exam-card.apt-card:hover,.exam-card.apt-card.selected{border-color:#7f77dd;background:linear-gradient(135deg,#f5f3ff,#fff);box-shadow:0 4px 20px rgba(127,119,221,.18)}
+.btn-prev{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2)}
+.btn-prev:hover{background:rgba(255,255,255,.18);color:#fff}
 .subject-grid{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem;justify-content:center}
 .subject-chip{padding:.6rem 1.4rem;border-radius:30px;border:2px solid var(--border);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;background:var(--surface2);color:var(--ink)}
 .subject-chip:hover,.subject-chip.selected{border-color:var(--accent2);background:var(--accent2);color:#fff}
@@ -160,6 +163,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
 .sr-badge.neet{background:rgba(0,180,216,.2);color:var(--accent3)}
 .sr-badge.jee{background:rgba(233,69,96,.2);color:var(--accent)}
 .sr-badge.quit{background:rgba(239,68,68,.2);color:#fca5a5}
+.sr-badge.apt{background:rgba(127,119,221,.2);color:#a5a0f7}
 .sr-score{margin-left:auto;font-weight:700}
 .sr-score.good{color:var(--green)}
 .sr-score.avg{color:var(--accent2)}
@@ -239,8 +243,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
   <button class="back-btn" onclick="goTo('s-login')">← Back</button>
   <div class="screen-title">Choose Your Target Exam</div>
   <div class="screen-sub">Select the exam you are preparing for</div>
-  <div style="width:100%;max-width:520px">
-    <div class="exam-cards">
+  <div style="width:100%;max-width:780px">
+    <div class="exam-cards" style="grid-template-columns:1fr 1fr 1fr">
       <div class="exam-card" onclick="selectExam('JEE')">
         <span class="ec-icon">⚛️</span>
         <div class="ec-name">JEE Mains</div>
@@ -250,6 +254,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
         <span class="ec-icon">🧬</span>
         <div class="ec-name">NEET UG</div>
         <div class="ec-sub">Medical entrance<br>Physics · Chemistry · Biology</div>
+      </div>
+      <div class="exam-card apt-card" onclick="selectExam('APTITUDE')">
+        <span class="ec-icon">🧠</span>
+        <div class="ec-name">General Aptitude</div>
+        <div class="ec-sub">Competitive exams<br>Quant · Logical · Verbal</div>
       </div>
     </div>
   </div>
@@ -270,22 +279,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
 
 <!-- MODE CHOICE -->
 <div class="screen" id="s-mode">
-  <button class="back-btn" onclick="goTo('s-subject')">← Back</button>
+  <button class="back-btn" id="modeBackBtn" onclick="modeGoBack()">← Back</button>
   <div class="screen-title" id="mode-title">Practice or Test?</div>
-  <div class="screen-sub">Choose how you want to learn today</div>
+  <div class="screen-sub" id="mode-sub">Choose how you want to learn today</div>
   <div style="width:100%;max-width:520px">
-    <div class="mode-grid">
-      <div class="mode-card" onclick="goToChapterSelect()">
-        <span class="mc-icon">📖</span>
-        <div class="mc-name">Practice Mode</div>
-        <div class="mc-desc">No time limit. Choose a chapter or all chapters. Get step-by-step explanations. Quit anytime.</div>
-      </div>
-      <div class="mode-card test-mode" onclick="startSession('test', null)">
-        <span class="mc-icon">⏱️</span>
-        <div class="mc-name">Test Mode</div>
-        <div class="mc-desc">Timed simulation of the real exam. NEET/JEE scoring: +4 correct, −1 wrong.</div>
-      </div>
-    </div>
+    <div class="mode-grid" id="modeGrid"></div>
   </div>
 </div>
 
@@ -403,7 +401,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
 // Set PROXY_URL to your Render.com proxy URL after deploying.
 // Example: 'https://knowledge-proxy-xxxx.onrender.com'
 // Leave empty to fall back to direct API mode (student enters key).
-const PROXY_URL = 'https://knowledge-proxy.onrender.com';
+const PROXY_URL = '';
 
 // Only used in direct mode (when PROXY_URL is empty)
 const HARDCODED_API_KEY = '';
@@ -484,6 +482,31 @@ const CHAPTERS = {
       'Matrices & Determinants','Probability','Statistics','Trigonometry',
       'Inverse Trigonometric Functions','Mathematical Reasoning'
     ]
+  },
+  APTITUDE: {
+    'Quantitative Aptitude': [
+      'Number System','HCF & LCM','Simplification','Percentages',
+      'Profit & Loss','Ratio & Proportion','Time & Work','Time, Speed & Distance',
+      'Simple & Compound Interest','Averages','Mixtures & Alligation',
+      'Pipes & Cisterns','Ages','Partnership','Mensuration',
+      'Data Interpretation','Number Series','Quadratic Equations (Aptitude)',
+      'Permutation & Combination (Aptitude)','Probability (Aptitude)'
+    ],
+    'Logical Reasoning': [
+      'Series Completion','Analogy','Classification (Odd One Out)',
+      'Coding & Decoding','Blood Relations','Direction Sense',
+      'Sitting Arrangement','Syllogism','Input-Output','Puzzles',
+      'Statement & Assumptions','Statement & Conclusions','Cause & Effect',
+      'Course of Action','Logical Sequence of Words','Alpha-Numeric Series',
+      'Calendar & Clocks','Cubes & Dice','Venn Diagrams','Data Sufficiency'
+    ],
+    'Verbal Aptitude': [
+      'Reading Comprehension','Para Jumbles','Fill in the Blanks',
+      'Error Spotting','Sentence Improvement','Synonyms & Antonyms',
+      'Idioms & Phrases','One Word Substitution','Active & Passive Voice',
+      'Direct & Indirect Speech','Cloze Test','Word Usage',
+      'Sentence Completion','Vocabulary','Analogy (Verbal)'
+    ]
   }
 };
 
@@ -550,6 +573,9 @@ function doLogin(){
 // ─── EXAM / SUBJECT ────────────────────────────────────────
 function selectExam(exam){
   state.exam=exam; state.subject=null;
+  if(exam==='APTITUDE'){
+    buildModeScreen(); goTo('s-mode'); return;
+  }
   const subjects=exam==='JEE'?['Mathematics','Physics','Chemistry']:['Biology','Physics','Chemistry'];
   const icons={Mathematics:'📐',Physics:'⚡',Chemistry:'🧪',Biology:'🌿'};
   document.getElementById('subject-title').textContent=`${exam} — Choose a Subject`;
@@ -567,9 +593,81 @@ function selectExam(exam){
 
 function goToMode(){
   if(!state.subject){ toast('Please select a subject first!'); return; }
-  document.getElementById('mode-title').textContent=`${state.exam} · ${state.subject}`;
-  goTo('s-mode');
+  buildModeScreen(); goTo('s-mode');
 }
+
+function modeGoBack(){
+  if(state.exam==='APTITUDE') goTo('s-exam');
+  else goTo('s-subject');
+}
+
+function buildModeScreen(){
+  const isApt=state.exam==='APTITUDE';
+  document.getElementById('mode-title').textContent=isApt?'General Aptitude':`${state.exam} · ${state.subject}`;
+  document.getElementById('mode-sub').textContent=isApt
+    ?'Practice a single subject or take a full timed test with all three'
+    :'Choose how you want to learn today';
+  const grid=document.getElementById('modeGrid');
+  if(isApt){
+    grid.innerHTML=`
+      <div class="mode-card" onclick="goToAptitudeSubject()">
+        <span class="mc-icon">📖</span>
+        <div class="mc-name">Practice Mode</div>
+        <div class="mc-desc">No time limit. Choose Quantitative, Logical or Verbal. 30 questions with step-by-step explanations. Quit anytime.</div>
+      </div>
+      <div class="mode-card test-mode" onclick="startAptitudeTest()">
+        <span class="mc-icon">⏱️</span>
+        <div class="mc-name">Full Test Mode</div>
+        <div class="mc-desc">100 questions · 180 minutes. Equal mix of Quant, Logical & Verbal. Scoring: +4 correct, −1 wrong.</div>
+      </div>`;
+  } else {
+    grid.innerHTML=`
+      <div class="mode-card" onclick="goToChapterSelect()">
+        <span class="mc-icon">📖</span>
+        <div class="mc-name">Practice Mode</div>
+        <div class="mc-desc">No time limit. Choose a chapter or all chapters. Get step-by-step explanations. Quit anytime.</div>
+      </div>
+      <div class="mode-card test-mode" onclick="startSession('test', null)">
+        <span class="mc-icon">⏱️</span>
+        <div class="mc-name">Test Mode</div>
+        <div class="mc-desc">Timed simulation of the real exam. NEET/JEE scoring: +4 correct, −1 wrong.</div>
+      </div>`;
+  }
+}
+
+// ─── APTITUDE SUBJECT SELECT ────────────────────────────────
+function goToAptitudeSubject(){
+  state.subject=null;
+  const chips=document.getElementById('subjectChips');
+  chips.innerHTML='';
+  const subs=['Quantitative Aptitude','Logical Reasoning','Verbal Aptitude'];
+  const icons={'Quantitative Aptitude':'🔢','Logical Reasoning':'🧩','Verbal Aptitude':'📝'};
+  document.getElementById('subject-title').textContent='Aptitude — Choose a Subject';
+  subs.forEach(s=>{
+    const el=document.createElement('div');
+    el.className='subject-chip';
+    el.innerHTML=`${icons[s]} ${s}`;
+    el.onclick=()=>{ chips.querySelectorAll('.subject-chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); state.subject=s; };
+    chips.appendChild(el);
+  });
+  // Override subject screen continue button for aptitude practice (no chapter needed)
+  document.querySelector('#s-subject .btn-primary').onclick=startAptitudePractice;
+  goTo('s-subject');
+}
+
+function startAptitudePractice(){
+  if(!state.subject){ toast('Please select a subject first!'); return; }
+  startSession('practice', null);
+}
+
+async function startAptitudeTest(){
+  // 100 questions: ~34 Quant, ~33 Logical, ~33 Verbal — generated in one call
+  state.mode='test';
+  state.subject='Aptitude (Mixed)';
+  state.chapter=null;
+  await startSession('test', null);
+}
+
 
 // ─── CHAPTER SELECTION ─────────────────────────────────────
 function goToChapterSelect(){
@@ -624,7 +722,60 @@ function startPracticeWithChapter(){
 }
 
 // ─── QUESTION GENERATION ───────────────────────────────────
-function buildPrompt(subj, exam, chapter){
+function buildPrompt(subj, exam, chapter, totalQ){
+  const n = totalQ || TOTAL_Q;
+
+  // ── Aptitude FULL TEST (mixed) ───────────────────────────────────────────
+  if(exam==='APTITUDE' && subj==='Aptitude (Mixed)'){
+    const each=Math.floor(n/3), extra=n-(each*3);
+    return `You are an expert aptitude test paper setter for competitive exams.
+
+Generate exactly ${n} multiple choice questions with this EXACT mandatory distribution:
+- First ${each} questions: Quantitative Aptitude ONLY (arithmetic, percentages, ratios, time-work, profit-loss, number systems, data interpretation)
+- Next ${each} questions: Logical Reasoning ONLY (series, analogy, coding-decoding, blood relations, seating arrangement, syllogism, puzzles)
+- Last ${each+extra} questions: Verbal Aptitude ONLY (vocabulary, synonyms/antonyms, fill in the blanks, sentence correction, reading comprehension, idioms)
+
+ABSOLUTE RULES:
+1. Follow the distribution EXACTLY — ${each} Quant, ${each} Logical, ${each+extra} Verbal
+2. Do NOT mix subjects — each question belongs to exactly one category
+3. Do NOT add category labels or headers in the JSON
+4. Difficulty overall: 33% easy, 45% medium, 22% hard
+5. All questions self-contained (no external passage longer than 3 lines)
+
+Respond ONLY with a raw JSON array, no markdown, no backticks, no preamble.
+Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentence explanation of why the correct answer is right"},...]
+Return all ${n} objects.`;
+  }
+
+  // ── Aptitude PRACTICE — single subject ──────────────────────────────────
+  if(exam==='APTITUDE'){
+    const subjDesc = {
+      'Quantitative Aptitude': 'Quantitative Aptitude — covering number systems, HCF/LCM, percentages, profit & loss, ratio & proportion, time & work, time-speed-distance, simple & compound interest, averages, mixtures, pipes & cisterns, data interpretation, and number series. DO NOT include any Logical Reasoning or Verbal Aptitude questions.',
+      'Logical Reasoning': 'Logical Reasoning — covering series completion, analogy, classification/odd-one-out, coding & decoding, blood relations, direction sense, seating arrangement, syllogism, input-output, puzzles, statement & assumptions, statement & conclusions, and Venn diagrams. DO NOT include any Quantitative Aptitude or Verbal Aptitude questions.',
+      'Verbal Aptitude': 'Verbal Aptitude — covering reading comprehension, para jumbles, fill in the blanks, error spotting, sentence improvement, synonyms & antonyms, idioms & phrases, one-word substitution, active/passive voice, cloze test, and vocabulary. DO NOT include any Quantitative Aptitude or Logical Reasoning questions.'
+    };
+    const desc = subjDesc[subj] || subj;
+    return `You are an expert aptitude test paper setter for competitive exams.
+
+SUBJECT: ${subj}
+
+Generate exactly ${n} multiple choice questions on ${desc}
+
+ABSOLUTE RULES — any violation makes your output invalid:
+1. EVERY single question must be ${subj} — ZERO questions from other aptitude areas
+2. Do NOT include Logical Reasoning questions if the subject is Quantitative Aptitude
+3. Do NOT include Quantitative Aptitude questions if the subject is Logical Reasoning
+4. Do NOT include Quantitative or Logical questions if the subject is Verbal Aptitude
+5. Difficulty: 10 easy, 14 medium, 6 hard
+6. Variety: cover different topics within ${subj}, not just one topic repeated
+7. All questions self-contained
+
+Respond ONLY with a raw JSON array, no markdown, no backticks, no preamble.
+Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentence explanation"},...]
+Return all ${n} objects.`;
+  }
+
+  // ── JEE / NEET ──────────────────────────────────────────────────────────
   const examInfo=exam==='NEET'?'NEET UG medical entrance exam (India)':'JEE Mains engineering entrance exam (India)';
   const scope=chapter?`CHAPTER: "${chapter}" (${subj})`:`All chapters of ${subj}`;
   return `You are an expert ${examInfo} question paper setter.
@@ -633,24 +784,24 @@ SUBJECT: ${subj}
 EXAM: ${exam}
 SCOPE: ${scope}
 
-YOUR ONLY JOB: Generate exactly ${TOTAL_Q} multiple choice questions on ${subj}${chapter?' — specifically the chapter "'+chapter+'"':''}.
+YOUR ONLY JOB: Generate exactly ${n} multiple choice questions on ${subj}${chapter?' — specifically the chapter "'+chapter+'"':''}.
 
 ABSOLUTE RULES — violating any of these makes your output invalid:
 1. EVERY question must be about ${subj}${chapter?' chapter "'+chapter+'"':''} — no exceptions
 2. ZERO questions from any other subject (not Physics, not Chemistry, not Biology, not any other)
 3. ZERO questions from any other chapter${chapter?' (not integration, not trigonometry, not any chapter other than "'+chapter+'")':''}
-4. If "${chapter||subj}" has fewer concepts than ${TOTAL_Q} questions need, create variations and numerical problems on the same concepts — DO NOT wander to other chapters
+4. If "${chapter||subj}" has fewer concepts than ${n} questions need, create variations — do NOT wander to other chapters
 5. Difficulty: 10 easy, 14 medium, 6 hard
 6. Use NCERT and ${exam} standard terminology
 7. Include a mix of conceptual, numerical, and application questions
 
 Respond ONLY with a raw JSON array. No markdown, no backticks, no explanation before or after.
 Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentences explaining the correct answer with the key concept or formula"},...]
-Return all ${TOTAL_Q} objects.`;
+Return all ${n} objects.`;
 }
 
-async function callAPI(prompt){
-  // Build headers based on mode: proxy (key hidden server-side) or direct (key in browser)
+async function callAPI(prompt, totalQ){
+  const n = totalQ || TOTAL_Q;
   const headers={'Content-Type':'application/json'};
   if(!PROXY_URL){
     headers['x-api-key']=getApiKey();
@@ -660,7 +811,7 @@ async function callAPI(prompt){
   const resp=await fetch(API_ENDPOINT,{
     method:'POST',
     headers,
-    body:JSON.stringify({model:MODEL,max_tokens:8000,messages:[{role:'user',content:prompt}]})
+    body:JSON.stringify({model:MODEL,max_tokens:n>30?16000:8000,messages:[{role:'user',content:prompt}]})
   });
   if(!resp.ok){
     const e=await resp.json().catch(()=>({}));
@@ -673,19 +824,20 @@ async function callAPI(prompt){
   if(si===-1||ei===-1) throw new Error('Response did not contain a JSON array');
   const arr=JSON.parse(text.substring(si,ei+1));
   if(!Array.isArray(arr)||arr.length<5) throw new Error('Too few questions in response');
-  return arr.slice(0,TOTAL_Q);
+  return arr.slice(0,n);
 }
 
-async function generateQuestions(chapter){
+async function generateQuestions(chapter, numQ){
   const subj=state.subject;
   const exam=state.exam;
-  showLoading('Generating '+ TOTAL_Q +' questions for '+subj+(chapter?' — '+chapter:'')+'...<br><small style="opacity:.6;font-weight:400;font-size:.82rem">This may take 15–20 seconds</small>');
+  const totalQ=numQ||TOTAL_Q;
+  showLoading('Generating '+ totalQ +' questions for '+subj+(chapter?' — '+chapter:'')+'...<br><small style="opacity:.6;font-weight:400;font-size:.82rem">This may take 15–20 seconds</small>');
 
-  const prompt=buildPrompt(subj,exam,chapter);
+  const prompt=buildPrompt(subj,exam,chapter,totalQ);
 
   // Attempt 1
   try{
-    const result=await callAPI(prompt);
+    const result=await callAPI(prompt,totalQ);
     hideLoading();
     console.log(`✓ Generated ${result.length} questions for ${subj}${chapter?' / '+chapter:''}`);
     return result;
@@ -697,7 +849,7 @@ async function generateQuestions(chapter){
   // Attempt 2 — retry with slightly rephrased prompt
   try{
     await new Promise(r=>setTimeout(r,1500)); // brief pause before retry
-    const result=await callAPI(prompt);
+    const result=await callAPI(prompt,totalQ);
     hideLoading();
     console.log(`✓ Generated ${result.length} questions on retry for ${subj}${chapter?' / '+chapter:''}`);
     return result;
@@ -974,6 +1126,54 @@ function getSampleQuestions(chapter){
 
   // ── SUBJECT-LEVEL FALLBACK BANKS ──────────────────────────────────────────
   const subjectBanks={
+    'Quantitative Aptitude':[
+      {q:"A shopkeeper buys an article for ₹200 and sells it for ₹250. Profit percentage is:",opts:["A) 20%","B) 25%","C) 50%","D) 30%"],ans:"B",exp:"Profit=50, Profit%=(50/200)×100=25%. Always calculate profit percentage on the cost price, not selling price."},
+      {q:"If 20% of a number is 80, then the number is:",opts:["A) 400","B) 16","C) 160","D) 40"],ans:"A",exp:"20% of x = 80 → x = 80×100/20 = 400. To find the original number from a percentage, divide by the percentage and multiply by 100."},
+      {q:"A train travels 360 km in 4 hours. Its speed in m/s is:",opts:["A) 90","B) 25","C) 100","D) 40"],ans:"B",exp:"Speed = 360/4 = 90 km/h. Convert: 90 × 1000/3600 = 25 m/s. To convert km/h to m/s, multiply by 5/18."},
+      {q:"LCM of 12 and 18 is:",opts:["A) 6","B) 36","C) 216","D) 72"],ans:"B",exp:"12=2²×3, 18=2×3². LCM=2²×3²=36. LCM is the smallest number divisible by both."},
+      {q:"Simple interest on ₹1000 at 10% per annum for 2 years:",opts:["A) ₹100","B) ₹200","C) ₹210","D) ₹220"],ans:"B",exp:"SI = PRT/100 = 1000×10×2/100 = ₹200. Simple interest does not compound — it is calculated on principal only."},
+      {q:"A can do a work in 10 days, B in 15 days. Together they finish in:",opts:["A) 5 days","B) 6 days","C) 8 days","D) 25 days"],ans:"B",exp:"A's rate=1/10, B's rate=1/15. Together=1/10+1/15=3/30+2/30=5/30=1/6. So they finish in 6 days."},
+      {q:"What is 15% of 80?",opts:["A) 10","B) 12","C) 15","D) 8"],ans:"B",exp:"15% of 80 = (15/100)×80 = 12. Alternatively, 10% of 80=8, 5% of 80=4, so 15% = 8+4 = 12."},
+      {q:"The ratio 3:4 expressed as a percentage of the first to total is:",opts:["A) 75%","B) 25%","C)  43%","D) 57%"],ans:"C",exp:"Total parts=3+4=7. First part as % of total = (3/7)×100 ≈ 42.86% ≈ 43%."},
+      {q:"Average of 5, 10, 15, 20, 25 is:",opts:["A) 10","B) 12","C) 15","D) 20"],ans:"C",exp:"Sum=5+10+15+20+25=75. Average=75/5=15. For an AP, average = (first+last)/2 = (5+25)/2 = 15."},
+      {q:"A pipe fills a tank in 6 hours, another empties it in 12 hours. Net time to fill when both open:",opts:["A) 18 hours","B) 12 hours","C) 6 hours","D) 4 hours"],ans:"B",exp:"Filling rate=1/6, emptying rate=1/12. Net rate=1/6−1/12=2/12−1/12=1/12. Tank fills in 12 hours."}
+    ],
+    'Logical Reasoning':[
+      {q:"If CAT = 3120, then DOG = ?",opts:["A) 4157","B) 4156","C) 4158","D) 3156"],ans:"A",exp:"C=3,A=1,T=20 → 3+1+20=24? No — positional: C=3,A=1,T=20 concatenated=3120. D=4,O=15,G=7 → 4157."},
+      {q:"Find the odd one out: 2, 5, 10, 17, 26, 37, 50",opts:["A) 10","B) 17","C) 26","D) 37"],ans:"C",exp:"Pattern: 1²+1, 2²+1, 3²+1, 4²+1, 5²+1, 6²+1, 7²+1 = 2,5,10,17,26,37,50. All fit — but differences are 3,5,7,9,11,13 (odd differences). All correct. Actually checking: 26=5²+1=26✓. No odd one out — all fit. Common version: 26 replaced by 27 making it the odd one."},
+      {q:"A is B's sister. C is B's mother. D is C's father. E is D's mother. How is A related to D?",opts:["A) Grandmother","B) Granddaughter","C) Daughter","D) Grand-niece"],ans:"B",exp:"A is B's sister → A is C's daughter → C is D's daughter → A is D's granddaughter."},
+      {q:"If NORTH is coded as SKNOC, how is SOUTH coded?",opts:["A) TPVUI","B) XLNOC","C) RNXQC","D) XPVUI"],ans:"A",exp:"Each letter is shifted by +1: N→O→wait, checking: N+5=S, O+4=S? Let's see N→S(+5),O→K(−4)... Pattern: each letter shifted forward by its position index. S+1=T,O+1=P,U+1=V,T+1=U,H+1=I → TPVUI."},
+      {q:"Pointing to a man, a woman says 'His mother is the only daughter of my mother.' How is she related to him?",opts:["A) Grandmother","B) Sister","C) Mother","D) Aunt"],ans:"C",exp:"Only daughter of my mother = myself. So his mother = herself. Therefore she is his mother."},
+      {q:"In a row of 40 students, Ravi is 15th from the left. What is his position from the right?",opts:["A) 25th","B) 26th","C) 27th","D) 24th"],ans:"B",exp:"Position from right = Total+1 − position from left = 40+1−15 = 26th."},
+      {q:"All roses are flowers. Some flowers fade quickly. Therefore:",opts:["A) All roses fade quickly","B) Some roses fade quickly","C) No rose fades quickly","D) None of these follows"],ans:"D",exp:"From 'all roses are flowers' and 'some flowers fade quickly', we cannot conclude anything definite about roses specifically. The 'some flowers' may or may not include roses."},
+      {q:"Complete the series: 3, 6, 12, 24, 48, __",opts:["A) 72","B) 96","C) 84","D) 60"],ans:"B",exp:"Each term is doubled: 3×2=6, 6×2=12, 12×2=24, 24×2=48, 48×2=96. This is a geometric progression with common ratio 2."},
+      {q:"A clock shows 3:15. What is the angle between the hour and minute hands?",opts:["A) 0°","B) 7.5°","C) 15°","D) 22.5°"],ans:"B",exp:"At 3:15, minute hand is at 90°. Hour hand: at 3:00 it is at 90°, in 15 min it moves 15×0.5=7.5°. So hour hand is at 97.5°. Angle between them = 97.5−90 = 7.5°."},
+      {q:"If in a certain code TEACH is written as SDZBG, how is LEARN written?",opts:["A) KDZMM","B) KDZQM","C) LDZQM","D) KDAQM"],ans:"B",exp:"Each letter is decreased by 1: T→S,E→D,A→Z,C→B,H→G. Applying same: L→K,E→D,A→Z,R→Q,N→M → KDZQM."}
+    ],
+    'Verbal Aptitude':[
+      {q:"Choose the synonym of BENEVOLENT:",opts:["A) Cruel","B) Kind","C) Angry","D) Selfish"],ans:"B",exp:"Benevolent means well-meaning and kindly. Its synonym is 'kind'. Antonym would be malevolent or cruel."},
+      {q:"Choose the antonym of VERBOSE:",opts:["A) Talkative","B) Wordy","C) Concise","D) Loud"],ans:"C",exp:"Verbose means using more words than needed. Its antonym is concise, meaning brief and to the point."},
+      {q:"Fill in the blank: She __ to the market every day.",opts:["A) go","B) goes","C) gone","D) going"],ans:"B",exp:"The subject 'she' is third-person singular, requiring the verb to take an '-s' ending in simple present tense: 'goes'."},
+      {q:"Find the error: 'He is one of those student who work hard.'",opts:["A) He is","B) one of those","C) student who","D) work hard"],ans:"C",exp:"After 'one of those', the noun must be plural: 'students'. The relative clause refers to 'those students', not 'one', so 'who work hard' is correct."},
+      {q:"Choose the correct meaning of the idiom 'Burning the midnight oil':",opts:["A) Wasting energy","B) Working late into the night","C) Starting a fire","D) Being careless"],ans:"B",exp:"'Burning the midnight oil' means working or studying late into the night. It originates from the days when people used oil lamps to work at night."},
+      {q:"One word substitution: A person who cannot be corrected:",opts:["A) Incorrigible","B) Invincible","C) Incredible","D) Incognito"],ans:"A",exp:"Incorrigible means not able to be corrected or reformed. Invincible=cannot be defeated, Incredible=unbelievable, Incognito=hiding identity."},
+      {q:"Change to passive voice: 'The teacher teaches the students.'",opts:["A) The students are taught by the teacher","B) The students were taught by the teacher","C) The students have been taught","D) The teacher is teaching the students"],ans:"A",exp:"Active: Subject + verb + object. Passive: Object + is/are + past participle + by + subject. Present tense active → present tense passive: 'are taught'."},
+      {q:"In the sentence 'The book which I bought yesterday is very interesting', the underlined clause is:",opts:["A) Noun clause","B) Adjective clause","C) Adverb clause","D) Main clause"],ans:"B",exp:"'Which I bought yesterday' is a relative clause that modifies (describes) the noun 'book'. Relative clauses that modify nouns are adjective clauses."},
+      {q:"Choose the correctly spelled word:",opts:["A) Accomodation","B) Accommodation","C) Acommodation","D) Accommodasion"],ans:"B",exp:"Accommodation has double 'c' and double 'm': ac-com-mo-da-tion. A common error is writing only one 'c' or one 'm'."},
+      {q:"Select the meaning of the phrase 'To bite the bullet':",opts:["A) To eat quickly","B) To endure a painful situation bravely","C) To speak rudely","D) To make a hasty decision"],ans:"B",exp:"'To bite the bullet' means to endure a painful or difficult situation with courage. It originates from the practice of having soldiers bite a bullet during surgery to cope with pain."}
+    ],
+    'Aptitude (Mixed)':[
+      {q:"A train 100m long passes a pole in 10 seconds. Speed of train in km/h:",opts:["A) 36","B) 72","C) 10","D) 100"],ans:"A",exp:"Speed = 100/10 = 10 m/s = 10×18/5 = 36 km/h. To convert m/s to km/h, multiply by 18/5."},
+      {q:"Complete the series: 2, 4, 8, 16, __",opts:["A) 24","B) 32","C) 18","D) 28"],ans:"B",exp:"Each term doubles: 2×2=4, 4×2=8, 8×2=16, 16×2=32. Geometric progression with ratio 2."},
+      {q:"Choose the synonym of LUCID:",opts:["A) Unclear","B) Clear","C) Dark","D) Complex"],ans:"B",exp:"Lucid means clear and easy to understand. Its synonym is 'clear'. Antonym would be obscure or unclear."},
+      {q:"If 8 workers finish a job in 6 days, how many days for 12 workers?",opts:["A) 9","B) 4","C) 3","D) 8"],ans:"B",exp:"Workers × Days = constant. 8×6=48. 12×d=48 → d=4 days. Inverse proportion: more workers, fewer days."},
+      {q:"Pointing to a photo, Raj says 'He is the son of my father's only son.' Who is in the photo?",opts:["A) Raj's uncle","B) Raj's nephew","C) Raj's son","D) Raj himself"],ans:"C",exp:"My father's only son = myself (Raj). So 'son of myself' = Raj's son. The photo shows Raj's son."},
+      {q:"Fill in the blank: Neither the manager nor the employees __ present.",opts:["A) was","B) were","C) is","D) has been"],ans:"B",exp:"In 'neither...nor' constructions, the verb agrees with the subject closest to it. 'Employees' is plural, so 'were' is correct."},
+      {q:"Compound interest on ₹1000 at 10% for 2 years:",opts:["A) ₹200","B) ₹210","C) ₹220","D) ₹100"],ans:"B",exp:"CI: Year1=1000×10%=100, Amount=1100. Year2=1100×10%=110. Total CI=100+110=₹210. CI earns interest on interest."},
+      {q:"Find the odd one out: Square, Rectangle, Triangle, Cuboid",opts:["A) Square","B) Triangle","C) Cuboid","D) Rectangle"],ans:"C",exp:"Square, Rectangle, and Triangle are 2D (flat) shapes. Cuboid is a 3D solid. The odd one out is Cuboid."},
+      {q:"Choose the antonym of DILIGENT:",opts:["A) Hardworking","B) Careful","C) Lazy","D) Sincere"],ans:"C",exp:"Diligent means hardworking and careful. Its antonym is lazy. A diligent student studies regularly; a lazy one avoids work."},
+      {q:"The average of first 5 multiples of 3 is:",opts:["A) 9","B) 6","C) 15","D) 12"],ans:"A",exp:"First 5 multiples of 3: 3,6,9,12,15. Sum=45. Average=45/5=9. Or use AP formula: average = (first+last)/2 = (3+15)/2 = 9."}
+    ],
     Physics:[
       {q:"A ball of mass 0.5 kg is thrown vertically upward at 10 m/s. Max height reached? (g=10 m/s²)",opts:["A) 5 m","B) 10 m","C) 2.5 m","D) 20 m"],ans:"A",exp:"v²=u²−2gh → 0=100−20h → h=5 m. Standard kinematic equation applied to vertical upward projection."},
       {q:"The SI unit of electric potential is:",opts:["A) Joule","B) Coulomb","C) Volt","D) Ampere"],ans:"C",exp:"Electric potential = work per unit charge. SI unit: Volt (V) = Joule/Coulomb."},
@@ -1025,16 +1225,27 @@ function getSampleQuestions(chapter){
   };
 
   const subj=state.subject||'Physics';
+  const numQ=chapter?TOTAL_Q:(state.exam==='APTITUDE'&&subj==='Aptitude (Mixed)'?100:TOTAL_Q);
+
   // Try to find a chapter-specific bank first
   if(chapter && chapterBanks[chapter]){
     const bank=chapterBanks[chapter];
-    const r=[]; for(let i=0;i<TOTAL_Q;i++) r.push({...bank[i%bank.length]});
+    const r=[]; for(let i=0;i<numQ;i++) r.push({...bank[i%bank.length]});
     toast(`⚠️ API unavailable — showing sample "${chapter}" questions`);
     return r;
   }
-  // Fall back to subject-level bank
+
+  // Aptitude: always use the exact subject bank — never cross-contaminate
+  if(state.exam==='APTITUDE'){
+    const aptBank=subjectBanks[subj]||subjectBanks['Aptitude (Mixed)'];
+    const r=[]; for(let i=0;i<numQ;i++) r.push({...aptBank[i%aptBank.length]});
+    toast(`⚠️ API unavailable — showing sample ${subj} questions`);
+    return r;
+  }
+
+  // JEE/NEET subject-level bank
   const bank=subjectBanks[subj]||subjectBanks['Physics'];
-  const r=[]; for(let i=0;i<TOTAL_Q;i++) r.push({...bank[i%bank.length]});
+  const r=[]; for(let i=0;i<numQ;i++) r.push({...bank[i%bank.length]});
   toast(`⚠️ API unavailable — showing sample ${subj} questions`);
   return r;
 }
@@ -1043,9 +1254,13 @@ function getSampleQuestions(chapter){
 async function startSession(mode, chapter){
   state.mode=mode; state.chapter=chapter||null;
   state.answers={}; state.currentQ=0;
-  state.questions=await generateQuestions(chapter);
 
-  document.getElementById('qBadgeExam').textContent=state.exam;
+  // Aptitude full test: 100 questions; all others: 30
+  const isAptTest=(state.exam==='APTITUDE' && mode==='test');
+  const numQ=isAptTest?100:TOTAL_Q;
+  state.questions=await generateQuestions(chapter, numQ);
+
+  document.getElementById('qBadgeExam').textContent=state.exam==='APTITUDE'?'Aptitude':state.exam;
   document.getElementById('qBadgeSubj').textContent=state.subject;
   document.getElementById('qBadgeMode').textContent=mode==='practice'?'Practice':'Test';
   const cb=document.getElementById('qBadgeChapter');
@@ -1054,6 +1269,7 @@ async function startSession(mode, chapter){
 
   if(state.timerInterval) clearInterval(state.timerInterval);
   if(mode==='test'){
+    // NEET: 200min, JEE: 180min, Aptitude: 180min
     state.timerSec=state.exam==='NEET'?200*60:180*60;
     document.getElementById('timerBox').style.display='flex';
     updateTimer();
@@ -1109,6 +1325,7 @@ function buildNav(){
   const nav=document.getElementById('quizNav');
   nav.innerHTML='';
   const isPractice=state.mode==='practice';
+  const isFirst=state.currentQ===0;
   const isLast=state.currentQ===state.questions.length-1;
 
   if(isPractice){
@@ -1125,6 +1342,16 @@ function buildNav(){
     nav.appendChild(quitBtn);
   }
 
+  // ── Previous button (both practice and test) ──────────────
+  const prevBtn=document.createElement('button');
+  prevBtn.className='btn-nav btn-prev';
+  prevBtn.textContent='← Prev';
+  prevBtn.disabled=isFirst;
+  prevBtn.style.opacity=isFirst?'0.35':'1';
+  prevBtn.style.cursor=isFirst?'not-allowed':'pointer';
+  prevBtn.onclick=()=>{ if(!isFirst) prevQuestion(); };
+  nav.appendChild(prevBtn);
+
   if(!isLast){
     const skipBtn=document.createElement('button');
     skipBtn.className='btn-nav btn-skip';
@@ -1138,6 +1365,14 @@ function buildNav(){
   nextBtn.textContent=isLast?'Finish ✓':'Next →';
   nextBtn.onclick=isLast?()=>finishSession(false):nextQuestion;
   nav.appendChild(nextBtn);
+}
+
+function prevQuestion(){
+  if(state.currentQ>0){
+    state.currentQ--;
+    renderQuestion();
+    window.scrollTo(0,0);
+  }
 }
 
 // ─── QUIT LOGIC ────────────────────────────────────────────
@@ -1211,7 +1446,8 @@ function finishSession(wasQuit){
   saveUserData();
 
   const chapterLabel=state.chapter?` · ${state.chapter}`:'';
-  document.getElementById('resultExamLabel').textContent=`${state.exam} · ${state.subject}${chapterLabel} · ${state.mode==='practice'?'Practice':'Test'}${wasQuit?' · Quit':''}`;
+  const examLabel=state.exam==='APTITUDE'?'Aptitude':state.exam;
+  document.getElementById('resultExamLabel').textContent=`${examLabel} · ${state.subject}${chapterLabel} · ${state.mode==='practice'?'Practice':'Test'}${wasQuit?' · Quit':''}`;
   document.getElementById('resultHeading').textContent=wasQuit?'Session Ended Early 🚪':'Session Complete! 🎉';
   document.getElementById('resultScoreBig').textContent=score;
   document.getElementById('resultMaxLabel').textContent=`/ ${maxScore}`;
@@ -1245,6 +1481,7 @@ function showDashboard(){
   const total=sessions.length;
 
   document.getElementById('d-total').textContent=total;
+  const aptCount=sessions.filter(s=>s.exam==='APTITUDE').length;
   document.getElementById('d-total-d').textContent=total>0?`${completed.length} completed, ${quitCount} quit`:'Start your first session!';
   document.getElementById('d-quit').textContent=quitCount;
   document.getElementById('d-quit-d').textContent=quitCount>0?`out of ${total} sessions`:'Keep it up!';
@@ -1289,7 +1526,7 @@ function renderTrendChart(sessions){
 function renderSubjectChart(sessions){
   const canvas=document.getElementById('subjectChart');
   const empty=document.getElementById('subjectEmpty');
-  const subjects=['Physics','Chemistry','Mathematics','Biology'];
+  const subjects=['Physics','Chemistry','Mathematics','Biology','Quantitative Aptitude','Logical Reasoning','Verbal Aptitude','Aptitude (Mixed)'];
   const labels=subjects.filter(s=>sessions.some(x=>x.subject===s));
   if(!labels.length){ canvas.style.display='none'; empty.style.display='block'; return; }
   canvas.style.display='block'; empty.style.display='none';

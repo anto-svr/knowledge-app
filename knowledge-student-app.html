@@ -725,22 +725,66 @@ function startPracticeWithChapter(){
 function buildPrompt(subj, exam, chapter, totalQ){
   const n = totalQ || TOTAL_Q;
 
+  // Random seed to ensure variety across sessions
+  const topics_quant = [
+    'number systems and divisibility','HCF, LCM and factors','percentages and their applications',
+    'profit, loss and discount','simple and compound interest','ratio, proportion and variation',
+    'time and work, pipes and cisterns','time, speed and distance, trains and boats',
+    'averages and weighted averages','mixtures and alligation','partnership and profit sharing',
+    'data interpretation — bar charts','data interpretation — pie charts','data interpretation — tables',
+    'number series and sequences','quadratic equations (aptitude)','permutation and combination (aptitude)',
+    'probability basics','ages and calendars','mensuration — area and perimeter'
+  ];
+  const topics_logical = [
+    'number and letter series','analogies — word and number','odd one out and classification',
+    'coding and decoding','blood relations','direction sense and distance',
+    'linear seating arrangement','circular seating arrangement','syllogism and logical deduction',
+    'input-output machines','statement and assumptions','statement and conclusions',
+    'cause and effect','course of action','logical sequence of words',
+    'alpha-numeric series','calendars and clocks','cubes, dice and counting figures',
+    'Venn diagrams','data sufficiency'
+  ];
+  const topics_verbal = [
+    'synonyms','antonyms','fill in the blanks — vocabulary',
+    'fill in the blanks — grammar','error spotting — subject-verb agreement',
+    'error spotting — tense','sentence improvement','sentence rearrangement (para jumbles)',
+    'reading comprehension — factual','reading comprehension — inferential',
+    'idioms and phrases','one word substitution','active and passive voice',
+    'direct and indirect speech','cloze test','word usage in context',
+    'sentence completion','analogy — word relationships','spelling correction','vocabulary in context'
+  ];
+
+  // Pick random topics for variety
+  function pickRandom(arr, count) {
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+  }
+
   // ── Aptitude FULL TEST (mixed) ───────────────────────────────────────────
   if(exam==='APTITUDE' && subj==='Aptitude (Mixed)'){
     const each=Math.floor(n/3), extra=n-(each*3);
+    const qTopics = pickRandom(topics_quant, 6).join(', ');
+    const lTopics = pickRandom(topics_logical, 6).join(', ');
+    const vTopics = pickRandom(topics_verbal, 6).join(', ');
+    const sessionSeed = Date.now().toString(36);
     return `You are an expert aptitude test paper setter for competitive exams.
+SESSION: ${sessionSeed}
 
-Generate exactly ${n} multiple choice questions with this EXACT mandatory distribution:
-- First ${each} questions: Quantitative Aptitude ONLY (arithmetic, percentages, ratios, time-work, profit-loss, number systems, data interpretation)
-- Next ${each} questions: Logical Reasoning ONLY (series, analogy, coding-decoding, blood relations, seating arrangement, syllogism, puzzles)
-- Last ${each+extra} questions: Verbal Aptitude ONLY (vocabulary, synonyms/antonyms, fill in the blanks, sentence correction, reading comprehension, idioms)
+Generate exactly ${n} UNIQUE multiple choice questions that have NEVER appeared in previous sessions.
+Use this EXACT mandatory distribution:
+- First ${each} questions: Quantitative Aptitude ONLY — focus especially on: ${qTopics}
+- Next ${each} questions: Logical Reasoning ONLY — focus especially on: ${lTopics}
+- Last ${each+extra} questions: Verbal Aptitude ONLY — focus especially on: ${vTopics}
 
 ABSOLUTE RULES:
 1. Follow the distribution EXACTLY — ${each} Quant, ${each} Logical, ${each+extra} Verbal
 2. Do NOT mix subjects — each question belongs to exactly one category
 3. Do NOT add category labels or headers in the JSON
-4. Difficulty overall: 33% easy, 45% medium, 22% hard
-5. All questions self-contained (no external passage longer than 3 lines)
+4. EVERY question must be DIFFERENT from standard textbook examples — use fresh numbers, names, scenarios
+5. Vary the question formats: some straightforward, some tricky, some with calculations
+6. Difficulty: 33% easy, 45% medium, 22% hard
+7. All questions self-contained (no external passage longer than 3 lines)
+8. Use different numerical values, names, and scenarios than you would typically default to
 
 Respond ONLY with a raw JSON array, no markdown, no backticks, no preamble.
 Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentence explanation of why the correct answer is right"},...]
@@ -750,24 +794,28 @@ Return all ${n} objects.`;
   // ── Aptitude PRACTICE — single subject ──────────────────────────────────
   if(exam==='APTITUDE'){
     const subjDesc = {
-      'Quantitative Aptitude': 'Quantitative Aptitude — covering number systems, HCF/LCM, percentages, profit & loss, ratio & proportion, time & work, time-speed-distance, simple & compound interest, averages, mixtures, pipes & cisterns, data interpretation, and number series. DO NOT include any Logical Reasoning or Verbal Aptitude questions.',
-      'Logical Reasoning': 'Logical Reasoning — covering series completion, analogy, classification/odd-one-out, coding & decoding, blood relations, direction sense, seating arrangement, syllogism, input-output, puzzles, statement & assumptions, statement & conclusions, and Venn diagrams. DO NOT include any Quantitative Aptitude or Verbal Aptitude questions.',
-      'Verbal Aptitude': 'Verbal Aptitude — covering reading comprehension, para jumbles, fill in the blanks, error spotting, sentence improvement, synonyms & antonyms, idioms & phrases, one-word substitution, active/passive voice, cloze test, and vocabulary. DO NOT include any Quantitative Aptitude or Logical Reasoning questions.'
+      'Quantitative Aptitude': { scope: 'Quantitative Aptitude ONLY', topics: topics_quant, ban: 'Logical Reasoning or Verbal Aptitude' },
+      'Logical Reasoning':    { scope: 'Logical Reasoning ONLY',    topics: topics_logical, ban: 'Quantitative Aptitude or Verbal Aptitude' },
+      'Verbal Aptitude':      { scope: 'Verbal Aptitude ONLY',      topics: topics_verbal, ban: 'Quantitative Aptitude or Logical Reasoning' }
     };
-    const desc = subjDesc[subj] || subj;
+    const sd = subjDesc[subj] || { scope: subj, topics: topics_quant, ban: 'other subjects' };
+    const focusTopics = pickRandom(sd.topics, 8).join(', ');
+    const sessionSeed = Date.now().toString(36);
     return `You are an expert aptitude test paper setter for competitive exams.
+SESSION: ${sessionSeed}
 
-SUBJECT: ${subj}
+SUBJECT: ${sd.scope}
 
-Generate exactly ${n} multiple choice questions on ${desc}
+Generate exactly ${n} UNIQUE multiple choice questions on ${sd.scope}.
+Focus especially on these topics this session (vary every session): ${focusTopics}
 
 ABSOLUTE RULES — any violation makes your output invalid:
-1. EVERY single question must be ${subj} — ZERO questions from other aptitude areas
-2. Do NOT include Logical Reasoning questions if the subject is Quantitative Aptitude
-3. Do NOT include Quantitative Aptitude questions if the subject is Logical Reasoning
-4. Do NOT include Quantitative or Logical questions if the subject is Verbal Aptitude
-5. Difficulty: 10 easy, 14 medium, 6 hard
-6. Variety: cover different topics within ${subj}, not just one topic repeated
+1. EVERY question must be ${sd.scope} — ZERO questions from ${sd.ban}
+2. ALL ${n} questions must be UNIQUE and DIFFERENT from each other
+3. Use VARIED numerical values, names, and scenarios — do not reuse the same numbers or setups
+4. Do NOT repeat question patterns — if you ask one percentage question, make the next one structurally different
+5. Difficulty: 10 easy, 14 medium, 6 hard — spread across the ${n} questions
+6. Cover as many different topics within ${sd.scope} as possible — do NOT repeat the same topic more than 3 times
 7. All questions self-contained
 
 Respond ONLY with a raw JSON array, no markdown, no backticks, no preamble.
@@ -775,28 +823,79 @@ Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp"
 Return all ${n} objects.`;
   }
 
-  // ── JEE / NEET ──────────────────────────────────────────────────────────
-  const examInfo=exam==='NEET'?'NEET UG medical entrance exam (India)':'JEE Mains engineering entrance exam (India)';
-  const scope=chapter?`CHAPTER: "${chapter}" (${subj})`:`All chapters of ${subj}`;
-  return `You are an expert ${examInfo} question paper setter.
+  // ── JEE Mains ────────────────────────────────────────────────────────────
+  if(exam==='JEE'){
+    const scope=chapter?`CHAPTER: "${chapter}" (${subj})`:`All chapters of ${subj}`;
+    const sessionSeed = Date.now().toString(36);
+    const jeeStyle = {
+      Physics: 'Expect multi-step numerical problems requiring substitution into formulas, application of multiple concepts in one problem, graph-based questions, and assertion-reason type questions. Use SI units throughout. Include problems on rotating reference frames, non-trivial projectile setups, RC/RL circuit transients, wave superposition, and modern physics calculations.',
+      Chemistry: 'Expect questions on reaction mechanisms, named reactions (Aldol, Cannizzaro, Grignard, Wurtz), mole concept calculations with limiting reagents, electrochemistry cell calculations, coordination compound nomenclature and properties, qualitative analysis, and industrial chemistry applications.',
+      Mathematics: 'Expect questions requiring multi-step algebra, integration by parts or substitution, matrix operations, 3D geometry with direction cosines, complex number arguments, probability using Bayes theorem, and questions where the answer is a non-obvious integer or fraction.'
+    };
+    const styleHint = jeeStyle[subj] || '';
+    return `You are an expert JEE Mains question paper setter with 15+ years of experience setting questions for IIT JEE and JEE Mains. You have deep knowledge of JEE Mains question papers from 2015 to 2024.
+SESSION: ${sessionSeed}
 
 SUBJECT: ${subj}
-EXAM: ${exam}
+EXAM: JEE Mains
 SCOPE: ${scope}
 
-YOUR ONLY JOB: Generate exactly ${n} multiple choice questions on ${subj}${chapter?' — specifically the chapter "'+chapter+'"':''}.
+YOUR TASK: Generate exactly ${n} UNIQUE, CHALLENGING multiple choice questions in the EXACT style of JEE Mains.
 
-ABSOLUTE RULES — violating any of these makes your output invalid:
-1. EVERY question must be about ${subj}${chapter?' chapter "'+chapter+'"':''} — no exceptions
-2. ZERO questions from any other subject (not Physics, not Chemistry, not Biology, not any other)
-3. ZERO questions from any other chapter${chapter?' (not integration, not trigonometry, not any chapter other than "'+chapter+'")':''}
-4. If "${chapter||subj}" has fewer concepts than ${n} questions need, create variations — do NOT wander to other chapters
-5. Difficulty: 10 easy, 14 medium, 6 hard
-6. Use NCERT and ${exam} standard terminology
-7. Include a mix of conceptual, numerical, and application questions
+JEE MAINS QUESTION STYLE for ${subj}:
+${styleHint}
 
-Respond ONLY with a raw JSON array. No markdown, no backticks, no explanation before or after.
-Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentences explaining the correct answer with the key concept or formula"},...]
+MANDATORY DIFFICULTY AND STYLE REQUIREMENTS:
+1. Difficulty: 5 easy (direct formula), 12 medium (2-step reasoning), 13 hard (multi-concept, tricky options)
+2. EVERY question must require GENUINE THINKING — no direct recall questions
+3. Options must be carefully designed: 3 plausible distractors that represent common mistakes
+4. Include questions where students must eliminate wrong options systematically
+5. At least 40% of questions must be numerical problems with specific calculated answers
+6. Questions must reflect actual JEE Mains difficulty — harder than NCERT, on par with past JEE papers
+7. Use exact JEE Mains phrasing: "Which of the following is CORRECT?", "The value of X is:", "Consider the following statements:"
+8. For Physics: include data given in problem, ask for derived quantity
+9. For Chemistry: include reaction conditions, temperature, catalysts where relevant
+10. For Mathematics: ask for the value of expressions, not just concepts
+
+ABSOLUTE RULES:
+- ALL questions on ${subj}${chapter?' chapter "'+chapter+'"':''} ONLY
+- ZERO questions from other subjects
+- Every question UNIQUE — no two questions test the same concept the same way
+- Options labelled A) B) C) D) with one correct answer
+
+Respond ONLY with a raw JSON array. No markdown, no backticks, no preamble.
+Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"Step-by-step solution showing the key formula/concept and calculation, as a JEE mentor would explain it"},...]
+Return all ${n} objects.`;
+  }
+
+  // ── NEET ────────────────────────────────────────────────────────────────
+  const scope=chapter?`CHAPTER: "${chapter}" (${subj})`:`All chapters of ${subj}`;
+  const sessionSeed = Date.now().toString(36);
+  return `You are an expert NEET UG question paper setter with deep knowledge of NEET question papers from 2015 to 2024.
+SESSION: ${sessionSeed}
+
+SUBJECT: ${subj}
+EXAM: NEET UG
+SCOPE: ${scope}
+
+YOUR ONLY JOB: Generate exactly ${n} UNIQUE multiple choice questions on ${subj}${chapter?' — specifically chapter "'+chapter+'"':''} in the exact style of NEET UG.
+
+NEET STYLE REQUIREMENTS:
+1. Difficulty: 10 easy (direct NCERT), 14 medium (application), 6 hard (multi-concept or tricky)
+2. Questions must be based on NCERT content but phrased in NEET exam style
+3. For Biology: include assertion-reason type, diagram-based (describe the diagram), and exception questions
+4. For Physics/Chemistry: include numerical problems with specific values
+5. Distractors must be carefully chosen — common misconceptions and partially correct statements
+6. Use exact NEET phrasing: "Which of the following is NOT correct?", "Select the INCORRECT statement"
+
+ABSOLUTE RULES:
+1. EVERY question on ${subj}${chapter?' chapter "'+chapter+'"':''} ONLY
+2. ZERO questions from other subjects
+3. Every question UNIQUE — vary phrasing, context, and approach
+4. Options labelled A) B) C) D) with exactly one correct answer
+
+Respond ONLY with a raw JSON array. No markdown, no backticks, no explanation.
+Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentences explaining the correct answer citing the NCERT concept or page-level knowledge"},...]
 Return all ${n} objects.`;
 }
 

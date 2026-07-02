@@ -907,30 +907,86 @@ async function callAPI(prompt, totalQ){
     headers['anthropic-version']='2023-06-01';
     headers['anthropic-dangerous-direct-browser-calls']='true';
   }
-  const resp=await fetch(API_ENDPOINT,{
-    method:'POST',
-    headers,
-    body:JSON.stringify({model:MODEL,max_tokens:n>30?16000:8000,messages:[{role:'user',content:prompt}]})
-  });
-  if(!resp.ok){
-    const e=await resp.json().catch(()=>({}));
-    throw new Error(e.error?.message||e.error||`HTTP ${resp.status}`);
+
+  // AbortController gives us a real timeout — default fetch() never times out
+  const controller = new AbortController();
+  const timeoutMs = n > 30 ? 120000 : 90000; // 120s for 100q, 90s for 30q
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const resp=await fetch(API_ENDPOINT,{
+      method:'POST',
+      headers,
+      signal: controller.signal,
+      body:JSON.stringify({
+        model:MODEL,
+        max_tokens: n > 30 ? 12000 : 6000, // enough for answers, not wasteful
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    clearTimeout(timeoutId);
+    if(!resp.ok){
+      const e=await resp.json().catch(()=>({}));
+      throw new Error(e.error?.message||e.error||`HTTP ${resp.status}`);
+    }
+    const data=await resp.json();
+    let text=data.content.map(c=>c.text||'').join('');
+    text=text.replace(/```json|```/g,'').trim();
+    const si=text.indexOf('['),ei=text.lastIndexOf(']');
+    if(si===-1||ei===-1) throw new Error('Response did not contain a JSON array');
+    let jsonStr=text.substring(si,ei+1);
+    // Sanitise common JSON-breaking characters from Claude's response
+    jsonStr=jsonStr
+      .replace(/[\u0000-\u001F\u007F]/g, m => {
+        // Keep valid JSON escape sequences, remove others
+        const allowed={'\n':'\\n','\r':'\\r','\t':'\\t'};
+        return allowed[m]||'';
+      })
+      // Fix unescaped quotes inside string values (heuristic)
+      .replace(/:\s*"((?:[^"\\]|\\.)*)"/g, (match) => {
+        return match;
+      });
+    let arr;
+    try {
+      arr=JSON.parse(jsonStr);
+    } catch(parseErr) {
+      // Try aggressive cleanup — remove all control characters and retry
+      console.warn('JSON parse failed, trying cleanup:', parseErr.message);
+      const cleaned=jsonStr.replace(/[\x00-\x1F\x7F]/g,'').replace(/,\s*]/g,']').replace(/,\s*}/g,'}');
+      arr=JSON.parse(cleaned);
+    }
+    if(!Array.isArray(arr)||arr.length<5) throw new Error('Too few questions in response');
+    // Filter out any malformed question objects
+    const valid=arr.filter(q=>q&&q.q&&Array.isArray(q.opts)&&q.opts.length>=2&&q.ans);
+    if(valid.length<5) throw new Error('Too few valid questions after filtering');
+    return valid.slice(0,n);
+  } catch(e) {
+    clearTimeout(timeoutId);
+    if(e.name==='AbortError') throw new Error('Request timed out — server took too long to respond');
+    throw e;
   }
-  const data=await resp.json();
-  let text=data.content.map(c=>c.text||'').join('');
-  text=text.replace(/```json|```/g,'').trim();
-  const si=text.indexOf('['),ei=text.lastIndexOf(']');
-  if(si===-1||ei===-1) throw new Error('Response did not contain a JSON array');
-  const arr=JSON.parse(text.substring(si,ei+1));
-  if(!Array.isArray(arr)||arr.length<5) throw new Error('Too few questions in response');
-  return arr.slice(0,n);
+}
+
+// Ping proxy to wake it from Render free-tier sleep before the real API call
+async function wakeProxy(){
+  if(!PROXY_URL) return;
+  try{
+    await fetch(PROXY_URL+'/health',{method:'GET',signal:AbortSignal.timeout(8000)});
+  }catch(e){
+    // Ignore — wake ping failing is non-critical
+  }
 }
 
 async function generateQuestions(chapter, numQ){
   const subj=state.subject;
   const exam=state.exam;
   const totalQ=numQ||TOTAL_Q;
-  showLoading('Generating '+ totalQ +' questions for '+subj+(chapter?' — '+chapter:'')+'...<br><small style="opacity:.6;font-weight:400;font-size:.82rem">This may take 15–20 seconds</small>');
+  const isLarge=totalQ>30;
+
+  showLoading(`Generating ${totalQ} questions for ${subj}${chapter?' — '+chapter:''}...<br><small style="opacity:.6;font-weight:400;font-size:.82rem">${isLarge?'Large test — please wait up to 60 seconds':'This may take 20–30 seconds'}</small>`);
+
+  // Wake the proxy first (non-blocking, gives Render time to spin up)
+  await wakeProxy();
 
   const prompt=buildPrompt(subj,exam,chapter,totalQ);
 
@@ -941,26 +997,27 @@ async function generateQuestions(chapter, numQ){
     console.log(`✓ Generated ${result.length} questions for ${subj}${chapter?' / '+chapter:''}`);
     return result;
   }catch(e){
-    console.warn('Attempt 1 failed:',e.message,'. Retrying...');
-    document.getElementById('loadingMsg').innerHTML='Retrying question generation...<br><small style="opacity:.6;font-weight:400;font-size:.82rem">One more moment please</small>';
+    console.warn('Attempt 1 failed:',e.message);
+    document.getElementById('loadingMsg').innerHTML=`Retrying... (${e.message.includes('timed out')?'server slow, please wait':'one moment'})<br><small style="opacity:.6;font-weight:400;font-size:.82rem">This can take up to 60 seconds</small>`;
   }
 
-  // Attempt 2 — retry with slightly rephrased prompt
+  // Attempt 2 — wait a bit then retry
   try{
-    await new Promise(r=>setTimeout(r,1500)); // brief pause before retry
+    await new Promise(r=>setTimeout(r,3000));
     const result=await callAPI(prompt,totalQ);
     hideLoading();
-    console.log(`✓ Generated ${result.length} questions on retry for ${subj}${chapter?' / '+chapter:''}`);
+    console.log(`✓ Generated ${result.length} questions on retry`);
     return result;
   }catch(e){
     hideLoading();
     console.error('Both attempts failed:',e.message);
-    // Show specific error to student so they know what happened
     const errMsg=e.message.includes('credit')||e.message.includes('billing')
-      ? 'API credits exhausted. Please top up at console.anthropic.com.'
+      ? '⚠️ API credits exhausted. Please top up at console.anthropic.com.'
       : e.message.includes('401')||e.message.includes('auth')
-      ? 'Invalid API key. Please check your key in the login screen.'
-      : 'Could not reach the AI (check your internet). Loading chapter-matched sample questions.';
+      ? '⚠️ Invalid API key. Please check your settings.'
+      : e.message.includes('timed out')
+      ? '⚠️ Server timed out. Showing sample questions — please try again in a moment.'
+      : '⚠️ Could not reach AI. Showing sample questions.';
     toast(errMsg);
     return getSampleQuestions(chapter);
   }

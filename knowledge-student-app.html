@@ -47,6 +47,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
 .exam-card .ec-sub{font-size:.8rem;color:var(--muted)}
 .exam-card.neet-card:hover,.exam-card.neet-card.selected{border-color:var(--accent3);background:linear-gradient(135deg,#f0fbff,#fff);box-shadow:0 4px 20px rgba(0,180,216,.18)}
 .exam-card.apt-card:hover,.exam-card.apt-card.selected{border-color:#7f77dd;background:linear-gradient(135deg,#f5f3ff,#fff);box-shadow:0 4px 20px rgba(127,119,221,.18)}
+.grade-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-top:1rem}
+.grade-card{border:2px solid var(--border);border-radius:var(--radius);padding:1.25rem 1rem;text-align:center;cursor:pointer;transition:all .22s;background:var(--surface2)}
+.grade-card:hover,.grade-card.selected{border-color:#7f77dd;background:linear-gradient(135deg,#f5f3ff,#fff);box-shadow:0 4px 16px rgba(127,119,221,.2)}
+.grade-card .gc-num{font-size:1.6rem;font-weight:800;color:#7f77dd;margin-bottom:.25rem}
+.grade-card .gc-age{font-size:.75rem;color:var(--muted);font-weight:600}
+.grade-card .gc-label{font-size:.78rem;color:var(--ink);margin-top:.2rem;font-weight:600}
+@media(max-width:600px){.grade-grid{grid-template-columns:repeat(2,1fr)}}
 .btn-prev{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2)}
 .btn-prev:hover{background:rgba(255,255,255,.18);color:#fff}
 .subject-grid{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem;justify-content:center}
@@ -287,6 +294,55 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
   </div>
 </div>
 
+<!-- GRADE SELECT (Aptitude only) -->
+<div class="screen" id="s-grade">
+  <button class="back-btn" onclick="goTo('s-exam')">← Back</button>
+  <div class="screen-title">Select Your Grade</div>
+  <div class="screen-sub">Choose your class so we can set the right difficulty level</div>
+  <div class="card" style="max-width:580px;padding:2rem">
+    <div class="grade-grid">
+      <div class="grade-card" onclick="selectGrade(6,this)">
+        <div class="gc-num">6</div>
+        <div class="gc-age">Age ~11</div>
+        <div class="gc-label">Class 6</div>
+      </div>
+      <div class="grade-card" onclick="selectGrade(7,this)">
+        <div class="gc-num">7</div>
+        <div class="gc-age">Age ~12</div>
+        <div class="gc-label">Class 7</div>
+      </div>
+      <div class="grade-card" onclick="selectGrade(8,this)">
+        <div class="gc-num">8</div>
+        <div class="gc-age">Age ~13</div>
+        <div class="gc-label">Class 8</div>
+      </div>
+      <div class="grade-card" onclick="selectGrade(9,this)">
+        <div class="gc-num">9</div>
+        <div class="gc-age">Age ~14</div>
+        <div class="gc-label">Class 9</div>
+      </div>
+      <div class="grade-card" onclick="selectGrade(10,this)">
+        <div class="gc-num">10</div>
+        <div class="gc-age">Age ~15</div>
+        <div class="gc-label">Class 10</div>
+      </div>
+      <div class="grade-card" onclick="selectGrade(11,this)">
+        <div class="gc-num">11</div>
+        <div class="gc-age">Age ~16</div>
+        <div class="gc-label">Class 11</div>
+      </div>
+      <div class="grade-card" onclick="selectGrade(12,this)">
+        <div class="gc-num">12</div>
+        <div class="gc-age">Age ~17</div>
+        <div class="gc-label">Class 12</div>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem">
+      <button class="btn btn-primary" onclick="confirmGrade()">Continue →</button>
+    </div>
+  </div>
+</div>
+
 <!-- CHAPTER SELECT (practice only) -->
 <div class="screen" id="s-chapter">
   <button class="back-btn" onclick="goTo('s-mode')">← Back</button>
@@ -401,7 +457,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--ink);min-heigh
 // Set PROXY_URL to your Render.com proxy URL after deploying.
 // Example: 'https://knowledge-proxy-xxxx.onrender.com'
 // Leave empty to fall back to direct API mode (student enters key).
-const PROXY_URL = 'https://knowledge-proxy.onrender.com';
+const PROXY_URL = '';
 
 // Only used in direct mode (when PROXY_URL is empty)
 const HARDCODED_API_KEY = '';
@@ -513,6 +569,7 @@ const CHAPTERS = {
 // ─── STATE ─────────────────────────────────────────────────
 let state = {
   user: null, exam: null, subject: null, mode: null, chapter: null,
+  grade: null,  // Grade 6-12, used for Aptitude only
   questions: [], currentQ: 0, answers: {},
   timerSec: 0, timerInterval: null, sessions: [],
   practiceScope: 'all'  // 'all' or 'chapter'
@@ -574,7 +631,10 @@ function doLogin(){
 function selectExam(exam){
   state.exam=exam; state.subject=null;
   if(exam==='APTITUDE'){
-    buildModeScreen(); goTo('s-mode'); return;
+    state.grade=null;
+    // Clear any previous grade selection
+    document.querySelectorAll('.grade-card').forEach(c=>c.classList.remove('selected'));
+    goTo('s-grade'); return;
   }
   const subjects=exam==='JEE'?['Mathematics','Physics','Chemistry']:['Biology','Physics','Chemistry'];
   const icons={Mathematics:'📐',Physics:'⚡',Chemistry:'🧪',Biology:'🌿'};
@@ -597,15 +657,28 @@ function goToMode(){
 }
 
 function modeGoBack(){
-  if(state.exam==='APTITUDE') goTo('s-exam');
+  if(state.exam==='APTITUDE') goTo('s-grade');
   else goTo('s-subject');
+}
+
+// ─── GRADE SELECTION (Aptitude only) ───────────────────────────────────────
+function selectGrade(grade, el){
+  state.grade=grade;
+  document.querySelectorAll('.grade-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function confirmGrade(){
+  if(!state.grade){ toast('Please select your grade first!'); return; }
+  buildModeScreen();
+  goTo('s-mode');
 }
 
 function buildModeScreen(){
   const isApt=state.exam==='APTITUDE';
-  document.getElementById('mode-title').textContent=isApt?'General Aptitude':`${state.exam} · ${state.subject}`;
+  document.getElementById('mode-title').textContent=isApt?`General Aptitude — Class ${state.grade||''}`:`${state.exam} · ${state.subject}`;
   document.getElementById('mode-sub').textContent=isApt
-    ?'Practice a single subject or take a full timed test with all three'
+    ?`Class ${state.grade} level · Practice a single subject or take a full timed test`
     :'Choose how you want to learn today';
   const grid=document.getElementById('modeGrid');
   if(isApt){
@@ -722,7 +795,7 @@ function startPracticeWithChapter(){
 }
 
 // ─── QUESTION GENERATION ───────────────────────────────────
-function buildPrompt(subj, exam, chapter, totalQ){
+function buildPrompt(subj, exam, chapter, totalQ, grade){
   const n = totalQ || TOTAL_Q;
 
   // Random seed to ensure variety across sessions
@@ -760,6 +833,17 @@ function buildPrompt(subj, exam, chapter, totalQ){
     return shuffled.slice(0, count);
   }
 
+  // Grade-level context for aptitude questions
+  const gradeContext = grade ? {
+    6:  'Class 6 student (age ~11). Use very simple language and basic arithmetic. Avoid fractions, decimals, or complex vocabulary. Keep scenarios relatable (school, home, playground).',
+    7:  'Class 7 student (age ~12). Use simple language. Include basic fractions, percentages, and simple word problems. Vocabulary at middle-school level.',
+    8:  'Class 8 student (age ~13). Include percentages, basic algebra, and ratio-proportion. Moderate vocabulary. Real-life scenarios.',
+    9:  'Class 9 student (age ~14). Include linear equations, basic geometry, and data interpretation. High-school vocabulary level.',
+    10: 'Class 10 student (age ~15). Include quadratic concepts, statistics, and compound interest. Board-exam level language and complexity.',
+    11: 'Class 11 student (age ~16). Include permutations, probability basics, and moderately complex reasoning. Pre-competitive level.',
+    12: 'Class 12 student (age ~17). Full competitive exam level. Complex multi-step problems. Advanced vocabulary and reasoning.'
+  }[grade] || '' : '';
+
   // ── Aptitude FULL TEST (mixed) ───────────────────────────────────────────
   if(exam==='APTITUDE' && subj==='Aptitude (Mixed)'){
     const each=Math.floor(n/3), extra=n-(each*3);
@@ -769,8 +853,9 @@ function buildPrompt(subj, exam, chapter, totalQ){
     const sessionSeed = Date.now().toString(36);
     return `You are an expert aptitude test paper setter for competitive exams.
 SESSION: ${sessionSeed}
+STUDENT LEVEL: ${gradeContext||'General competitive exam level'}
 
-Generate exactly ${n} UNIQUE multiple choice questions that have NEVER appeared in previous sessions.
+Generate exactly ${n} UNIQUE multiple choice questions calibrated for the student level above.
 Use this EXACT mandatory distribution:
 - First ${each} questions: Quantitative Aptitude ONLY — focus especially on: ${qTopics}
 - Next ${each} questions: Logical Reasoning ONLY — focus especially on: ${lTopics}
@@ -780,14 +865,13 @@ ABSOLUTE RULES:
 1. Follow the distribution EXACTLY — ${each} Quant, ${each} Logical, ${each+extra} Verbal
 2. Do NOT mix subjects — each question belongs to exactly one category
 3. Do NOT add category labels or headers in the JSON
-4. EVERY question must be DIFFERENT from standard textbook examples — use fresh numbers, names, scenarios
-5. Vary the question formats: some straightforward, some tricky, some with calculations
+4. Calibrate language, vocabulary, and calculation depth to the STUDENT LEVEL above
+5. EVERY question DIFFERENT — fresh numbers, names, scenarios each time
 6. Difficulty: 5% easy, 20% medium, 75% hard
-7. All questions self-contained (no external passage longer than 3 lines)
-8. Use different numerical values, names, and scenarios than you would typically default to
+7. All questions self-contained (no passage longer than 3 lines)
 
 Respond ONLY with a raw JSON array, no markdown, no backticks, no preamble.
-Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentence explanation of why the correct answer is right"},...]
+Format: [{"q":"...","opts":["A) ...","B) ...","C) ...","D) ..."],"ans":"A","exp":"2-3 sentence explanation"},...]
 Return all ${n} objects.`;
   }
 
@@ -803,19 +887,19 @@ Return all ${n} objects.`;
     const sessionSeed = Date.now().toString(36);
     return `You are an expert aptitude test paper setter for competitive exams.
 SESSION: ${sessionSeed}
-
 SUBJECT: ${sd.scope}
+STUDENT LEVEL: ${gradeContext||'General competitive exam level'}
 
-Generate exactly ${n} UNIQUE multiple choice questions on ${sd.scope}.
-Focus especially on these topics this session (vary every session): ${focusTopics}
+Generate exactly ${n} UNIQUE multiple choice questions on ${sd.scope}, calibrated for the student level above.
+Focus especially on these topics this session: ${focusTopics}
 
-ABSOLUTE RULES — any violation makes your output invalid:
+ABSOLUTE RULES:
 1. EVERY question must be ${sd.scope} — ZERO questions from ${sd.ban}
-2. ALL ${n} questions must be UNIQUE and DIFFERENT from each other
-3. Use VARIED numerical values, names, and scenarios — do not reuse the same numbers or setups
-4. Do NOT repeat question patterns — if you ask one percentage question, make the next one structurally different
+2. ALL ${n} questions UNIQUE and DIFFERENT from each other
+3. Calibrate language, vocabulary, and calculation complexity to the STUDENT LEVEL above
+4. Use VARIED numerical values, names, and scenarios
 5. Difficulty: 2 easy, 6 medium, 22 hard — spread across the ${n} questions
-6. Cover as many different topics within ${sd.scope} as possible — do NOT repeat the same topic more than 3 times
+6. Cover different topics within ${sd.scope} — do NOT repeat same topic more than 3 times
 7. All questions self-contained
 
 Respond ONLY with a raw JSON array, no markdown, no backticks, no preamble.
@@ -944,7 +1028,7 @@ async function generateQuestions(chapter, numQ){
   // Wake the proxy first (non-blocking, gives Render time to spin up)
   await wakeProxy();
 
-  const prompt=buildPrompt(subj,exam,chapter,totalQ);
+  const prompt=buildPrompt(subj,exam,chapter,totalQ,state.grade);
 
   // Attempt 1
   try{
@@ -1372,7 +1456,7 @@ async function startSession(mode, chapter){
   const numQ=isAptTest?100:TOTAL_Q;
   state.questions=await generateQuestions(chapter, numQ);
 
-  document.getElementById('qBadgeExam').textContent=state.exam==='APTITUDE'?'Aptitude':state.exam;
+  document.getElementById('qBadgeExam').textContent=state.exam==='APTITUDE'?`Aptitude · Cl.${state.grade||''}`:state.exam;
   document.getElementById('qBadgeSubj').textContent=state.subject;
   document.getElementById('qBadgeMode').textContent=mode==='practice'?'Practice':'Test';
   const cb=document.getElementById('qBadgeChapter');
@@ -1549,7 +1633,8 @@ function finishSession(wasQuit){
 
   const session={
     id:Date.now(), exam:state.exam, subject:state.subject, mode:state.mode,
-    chapter:state.chapter||null, date:new Date().toLocaleDateString('en-IN'),
+    chapter:state.chapter||null, grade:state.grade||null,
+    date:new Date().toLocaleDateString('en-IN'),
     score, maxScore, pct, correct, wrong, skipped, total:state.questions.length,
     quit:wasQuit, answeredAt:wasQuit?state.currentQ+1:state.questions.length
   };
